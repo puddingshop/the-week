@@ -238,6 +238,13 @@
     font-weight: 700;
     vertical-align: 0.65em;
   }
+  .nt-weekday {
+    font-size: clamp(44px, 11vw, 72px);
+    font-weight: 200;
+    letter-spacing: -0.03em;
+    color: var(--now-text, white);
+    line-height: 1;
+  }
   .nt-date {
     font-size: clamp(44px, 11vw, 72px);
     font-weight: 800;
@@ -1121,6 +1128,7 @@
         <div class="nt-time-wrap">
           <span class="nt-time" id="nt-time-big">11:15<span class="ampm">am</span></span>
         </div>
+        <div class="nt-weekday" id="nt-weekday">Wednesday</div>
         <div class="nt-date" id="nt-date">2 May</div>
       </div>
 
@@ -1780,6 +1788,7 @@
     document.getElementById('nt-year').textContent = now.getFullYear();
     document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
     document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
+    document.getElementById('nt-weekday').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
     document.getElementById('nt-date').textContent = `${now.getDate()} ${month}`;
   }
 
