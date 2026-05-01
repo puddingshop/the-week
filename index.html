@@ -350,16 +350,12 @@
   .dh.today .dh-dow { color: var(--accent); }
   .dh.today .dh-num { color: var(--accent); }
 
-  /* View Transition (smooth zoom between modes) */
+  /* View Transition (snappy cross-fade between modes) */
   @media (prefers-reduced-motion: no-preference) {
-    ::view-transition-group(*) {
-      animation-duration: 0.5s;
-      animation-timing-function: cubic-bezier(0.32, 0.72, 0.24, 1);
-    }
-    ::view-transition-old(*),
-    ::view-transition-new(*) {
-      animation-duration: 0.5s;
-      animation-timing-function: cubic-bezier(0.32, 0.72, 0.24, 1);
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.28s;
+      animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 
@@ -992,8 +988,7 @@
       dh.dataset.offset = off;
       const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
       const dnum = d.getDate();
-      const safeOff = off < 0 ? `n${-off}` : `p${off}`;
-      dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num" style="view-transition-name: dnum-${safeOff};">${dnum}</div>`;
+      dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
       dh.addEventListener('click', (e) => {
         e.stopPropagation();
         if (viewMode === 'day') {
