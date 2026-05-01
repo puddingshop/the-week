@@ -1456,7 +1456,9 @@
       });
       if (cur.length) clusters.push(cur);
 
+      const personOrder = ['jordan','sarah','phoenix','lua'];
       clusters.forEach(cluster => {
+        cluster.sort((a, b) => personOrder.indexOf(a.p) - personOrder.indexOf(b.p));
         const lanes = [];
         cluster.forEach(ev => {
           const s = timeToMinutes(ev.start);
