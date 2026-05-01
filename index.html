@@ -942,7 +942,6 @@
     display: flex;
     align-items: center;
     gap: 7px;
-    margin-bottom: 10px;
   }
   .ev-modal-dot {
     width: 8px; height: 8px;
@@ -957,20 +956,45 @@
     color: var(--mute);
   }
   .ev-modal-title {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin-bottom: 6px;
     line-height: 1.15;
+    margin-top: 10px;
   }
-  .ev-modal-time {
+  .ev-modal-when {
     font-size: 13px;
     font-variant-numeric: tabular-nums;
     color: var(--mute);
-    letter-spacing: 0.04em;
-    margin-bottom: 14px;
+    margin-top: 3px;
+    margin-bottom: 16px;
   }
+  .ev-note-read {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.45;
+    padding: 10px 12px;
+    background: var(--hair);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .ev-note-read.empty {
+    color: var(--faint);
+  }
+  .ev-note-read .ev-note-edit-icon {
+    font-size: 11px;
+    color: var(--faint);
+    margin-left: auto;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .ev-note-write { display: none; }
+  .ev-note-write.shown { display: block; }
+  .ev-note-read.hidden { display: none; }
 
   /* ============ DEV PANEL ============ */
   .dev-panel {
@@ -1153,13 +1177,22 @@
           <div class="ev-modal-dot" id="ev-modal-dot"></div>
           <div class="ev-modal-who" id="ev-modal-who"></div>
         </div>
-        <button class="modal-cancel" id="ev-modal-cancel">CANCEL</button>
+        <button class="modal-cancel" id="ev-modal-cancel">CLOSE</button>
       </div>
       <div class="ev-modal-title" id="ev-modal-title"></div>
-      <div class="ev-modal-time" id="ev-modal-time"></div>
-      <textarea class="modal-textarea" id="ev-modal-notes" placeholder="Add a note…"></textarea>
-      <div class="modal-actions">
-        <button class="btn btn-primary" id="ev-modal-save">SAVE</button>
+      <div class="ev-modal-when" id="ev-modal-when"></div>
+      <!-- read mode -->
+      <div class="ev-note-read" id="ev-note-read">
+        <span id="ev-note-read-text"></span>
+        <span class="ev-note-edit-icon">✎</span>
+      </div>
+      <!-- write mode -->
+      <div class="ev-note-write" id="ev-note-write">
+        <textarea class="modal-textarea" id="ev-modal-notes" placeholder="Add a note…"></textarea>
+        <div class="modal-actions" style="margin-top:10px;">
+          <button class="btn btn-danger" id="ev-note-discard">CANCEL</button>
+          <button class="btn btn-primary" id="ev-modal-save">SAVE</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1193,6 +1226,11 @@
 
 <!-- ============ DEV PANEL (in grey area) ============ -->
 <div class="dev-panel">
+  <div class="dev-title">DAY SIM</div>
+  <div class="dev-row">
+    <input type="range" id="dev-day" min="0" max="6" step="1" value="4">
+    <span class="dev-val" id="dev-day-val">FRI</span>
+  </div>
   <div class="dev-title">FRAME</div>
   <div class="dev-row">
     <label>Width</label>
@@ -1310,11 +1348,9 @@
   }
   function pad2(n){ return String(n).padStart(2,'0'); }
 
-  // For testing — set a "fake now" so demo events look interactive.
-  // Set to null to use real time.
-  const FAKE_NOW = new Date();
-  FAKE_NOW.setHours(11, 15, 0, 0);
-  function realNow() { return FAKE_NOW || new Date(); }
+  let fakeNow = new Date();
+  fakeNow.setHours(11, 15, 0, 0);
+  function realNow() { return fakeNow; }
 
   // ============================================================
   // STATE
@@ -1569,25 +1605,61 @@
   // ============================================================
   let currentEventKey = null;
 
+  function evModalShowRead() {
+    const note = currentEventKey ? (localStorage.getItem(currentEventKey) || '') : '';
+    const readEl = document.getElementById('ev-note-read');
+    const readText = document.getElementById('ev-note-read-text');
+    readEl.classList.remove('hidden');
+    document.getElementById('ev-note-write').classList.remove('shown');
+    if (note) {
+      readText.textContent = note;
+      readEl.classList.remove('empty');
+    } else {
+      readText.textContent = 'Add a note…';
+      readEl.classList.add('empty');
+    }
+    document.getElementById('ev-modal-cancel').textContent = 'CLOSE';
+  }
+
+  function evModalShowWrite() {
+    const note = currentEventKey ? (localStorage.getItem(currentEventKey) || '') : '';
+    document.getElementById('ev-note-read').classList.add('hidden');
+    document.getElementById('ev-note-write').classList.add('shown');
+    document.getElementById('ev-modal-notes').value = note;
+    document.getElementById('ev-modal-cancel').textContent = 'CANCEL';
+    setTimeout(() => document.getElementById('ev-modal-notes').focus(), 50);
+  }
+
   function openEventModal(ev) {
     const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const date = new Date(); date.setDate(date.getDate() + ev.d);
-    const dateKey = date.toISOString().slice(0, 10);
-    const dayLabel = dayNames[date.getDay()].toUpperCase();
+    const date = new Date(realNow()); date.setDate(date.getDate() + ev.d);
+    const dk = date.toISOString().slice(0, 10);
+    const dayLabel = dayNames[date.getDay()];
+    const dateLabel = `${dayLabel} ${date.getDate()} ${date.toLocaleDateString('en-US',{month:'long'})}`;
     const personLabel = ev.p[0].toUpperCase() + ev.p.slice(1);
-    currentEventKey = `evnote-${ev.p}-${dateKey}-${ev.start}`;
+    currentEventKey = `evnote-${ev.p}-${dk}-${ev.start}`;
     document.getElementById('ev-modal-dot').style.background = `var(--${ev.p})`;
-    document.getElementById('ev-modal-who').textContent = `${personLabel} · ${dayLabel}`;
+    document.getElementById('ev-modal-who').textContent = `${personLabel}`;
     document.getElementById('ev-modal-title').textContent = ev.t;
-    document.getElementById('ev-modal-time').textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
-    document.getElementById('ev-modal-notes').value = localStorage.getItem(currentEventKey) || '';
+    document.getElementById('ev-modal-when').textContent = `${dateLabel} · ${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+    evModalShowRead();
     document.getElementById('ev-modal').classList.add('shown');
   }
+
   function closeEventModal() {
     document.getElementById('ev-modal').classList.remove('shown');
     currentEventKey = null;
   }
-  document.getElementById('ev-modal-cancel').addEventListener('click', closeEventModal);
+
+  document.getElementById('ev-note-read').addEventListener('click', evModalShowWrite);
+  document.getElementById('ev-note-discard').addEventListener('click', evModalShowRead);
+  document.getElementById('ev-modal-cancel').addEventListener('click', () => {
+    if (document.getElementById('ev-note-write').classList.contains('shown')) {
+      evModalShowRead();
+    } else {
+      closeEventModal();
+    }
+  });
   document.getElementById('ev-modal').addEventListener('click', (e) => {
     if (e.target.id === 'ev-modal') closeEventModal();
   });
@@ -1597,7 +1669,7 @@
       if (note) localStorage.setItem(currentEventKey, note);
       else localStorage.removeItem(currentEventKey);
     }
-    closeEventModal();
+    evModalShowRead();
   });
 
   // ============================================================
@@ -2076,6 +2148,35 @@
   }
 
   // ============================================================
+  // DEV PANEL — day simulator
+  // ============================================================
+  const SIM_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  // slider 0=Mon..6=Sun → getDay() 1=Mon..0=Sun
+  const SLIDER_TO_GETDAY = [1,2,3,4,5,6,0];
+  const GETDAY_TO_SLIDER = [6,0,1,2,3,4,5]; // getDay(0=Sun)→6, getDay(1=Mon)→0, etc.
+
+  function setSimDay(sliderVal) {
+    const targetGetDay = SLIDER_TO_GETDAY[sliderVal];
+    const realToday = new Date();
+    const diff = targetGetDay - realToday.getDay();
+    fakeNow = new Date(realToday);
+    fakeNow.setDate(fakeNow.getDate() + diff);
+    fakeNow.setHours(11, 15, 0, 0);
+    document.getElementById('dev-day-val').textContent = SIM_DAYS[sliderVal];
+    const newDay = fakeNow.getDay();
+    viewMode = (newDay === 5 || newDay === 6 || newDay === 0) ? 'weekend' : 'weekdays';
+    prevNormalMode = viewMode;
+    focusedDayOffset = 0;
+    updateTopDate();
+    setMode(viewMode);
+  }
+
+  const devDaySlider = document.getElementById('dev-day');
+  const initSliderVal = GETDAY_TO_SLIDER[new Date().getDay()];
+  devDaySlider.value = initSliderVal;
+  document.getElementById('dev-day-val').textContent = SIM_DAYS[initSliderVal];
+  devDaySlider.addEventListener('input', () => setSimDay(+devDaySlider.value));
+
   // DEV PANEL — frame size controls
   // ============================================================
   const DEV_KEY = 'theweek.frame.v1';
