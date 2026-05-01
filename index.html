@@ -989,26 +989,39 @@
   body[data-mode="now"] .people { display: none; }
 
   /* === Toast for tap event details === */
-  .pin-bar {
-    position: absolute;
-    left: 14px; right: 14px;
-    bottom: 8px;
-    background: var(--ink);
-    color: white;
-    border-radius: 8px;
-    padding: 8px 12px;
-    display: none;
+  /* event detail modal */
+  .ev-modal-person {
+    display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 11px;
-    z-index: 20;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    gap: 7px;
+    margin-bottom: 10px;
   }
-  .pin-bar.shown { display: flex; }
-  .pin-bar .pin-swatch { width: 4px; height: 22px; border-radius: 2px; }
-  .pin-bar .pin-title { font-weight: 600; flex: 1; }
-  .pin-bar .pin-when { color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
-  .pin-bar .pin-x { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+  .ev-modal-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ev-modal-who {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .ev-modal-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.15;
+  }
+  .ev-modal-time {
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--mute);
+    letter-spacing: 0.04em;
+  }
 
   /* ============ DEV PANEL ============ */
   .dev-panel {
@@ -1152,12 +1165,6 @@
         </div>
       </div>
 
-      <div class="pin-bar" id="pin-bar">
-        <div class="pin-swatch" id="pin-swatch"></div>
-        <div class="pin-title" id="pin-title"></div>
-        <div class="pin-when" id="pin-when"></div>
-        <button class="pin-x" id="pin-x">×</button>
-      </div>
 
     </div>
   </div>
@@ -1186,6 +1193,21 @@
         <button class="btn btn-danger" id="meal-modal-delete">DELETE</button>
         <button class="btn btn-primary" id="meal-modal-save">SAVE</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== Event detail modal ===== -->
+  <div class="modal-backdrop" id="ev-modal">
+    <div class="modal" onclick="event.stopPropagation();">
+      <div class="modal-head">
+        <div class="ev-modal-person">
+          <div class="ev-modal-dot" id="ev-modal-dot"></div>
+          <div class="ev-modal-who" id="ev-modal-who"></div>
+        </div>
+        <button class="modal-cancel" id="ev-modal-close">CLOSE</button>
+      </div>
+      <div class="ev-modal-title" id="ev-modal-title"></div>
+      <div class="ev-modal-time" id="ev-modal-time"></div>
     </div>
   </div>
 
@@ -1346,7 +1368,6 @@
   // ============================================================
   let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
   let focusedDayOffset = null; // which day column is colour-revealed, or null
-  let pinned = null;
   let viewMode = 'weekdays'; // weekend / weekdays / week / now / day
   let viewDayOffset = 0;     // when in 'day' mode, which day
   let prevNormalMode = 'weekdays'; // remembers last weekend/weekdays/week
@@ -1517,7 +1538,7 @@
         el.innerHTML = `<div class="t">${ev.t}</div>${showWhen ? `<div class="when">${fmtTime(ev.start)}</div>` : ''}`;
         el.addEventListener('click', (e) => {
           e.stopPropagation();
-          pinEvent(ev);
+          openEventModal(ev);
         });
         col.appendChild(el);
       });
@@ -1581,20 +1602,25 @@
   });
 
   // ============================================================
-  // PIN EVENT
+  // EVENT DETAIL MODAL
   // ============================================================
-  function pinEvent(ev) {
-    pinned = ev;
-    const bar = document.getElementById('pin-bar');
-    const sw = document.getElementById('pin-swatch');
-    sw.style.background = `var(--${ev.p})`;
-    document.getElementById('pin-title').textContent = `${ev.p[0].toUpperCase()}${ev.p.slice(1)} · ${ev.t}`;
-    document.getElementById('pin-when').textContent = `${fmtTime(ev.start)}–${fmtTime(ev.end)}`;
-    bar.classList.add('shown');
+  function openEventModal(ev) {
+    const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const date = new Date(); date.setDate(date.getDate() + ev.d);
+    const dayLabel = dayNames[date.getDay()].toUpperCase();
+    const personLabel = ev.p[0].toUpperCase() + ev.p.slice(1);
+    document.getElementById('ev-modal-dot').style.background = `var(--${ev.p})`;
+    document.getElementById('ev-modal-who').textContent = `${personLabel} · ${dayLabel}`;
+    document.getElementById('ev-modal-title').textContent = ev.t;
+    document.getElementById('ev-modal-time').textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+    document.getElementById('ev-modal').classList.add('shown');
   }
-  document.getElementById('pin-x').addEventListener('click', () => {
-    document.getElementById('pin-bar').classList.remove('shown');
-    pinned = null;
+  function closeEventModal() {
+    document.getElementById('ev-modal').classList.remove('shown');
+  }
+  document.getElementById('ev-modal-close').addEventListener('click', closeEventModal);
+  document.getElementById('ev-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'ev-modal') closeEventModal();
   });
 
   // ============================================================
