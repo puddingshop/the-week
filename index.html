@@ -198,11 +198,12 @@
 
   /* ============ NOW VIEW ============ */
   #view-now {
-    background: var(--bg);
+    background: var(--now-bg, #CF5B27);
     padding: 28px 28px 32px;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
+    transition: background 0.4s ease;
   }
   .nt-meta {
     display: flex;
@@ -212,7 +213,7 @@
     font-weight: 700;
     letter-spacing: 0.38em;
     text-transform: uppercase;
-    color: var(--faint);
+    color: var(--now-meta, rgba(255,255,255,0.45));
   }
   .nt-time-wrap {
     flex: 1;
@@ -224,13 +225,13 @@
     font-weight: 200;
     letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
-    color: var(--ink);
+    color: var(--now-text, white);
     line-height: 1;
     white-space: nowrap;
   }
   .nt-time .ampm {
     font-size: 11px;
-    color: var(--mute);
+    color: var(--now-meta, rgba(255,255,255,0.45));
     margin-left: 6px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -241,7 +242,7 @@
     font-size: clamp(44px, 11vw, 72px);
     font-weight: 800;
     letter-spacing: -0.03em;
-    color: var(--ink);
+    color: var(--now-text, white);
     line-height: 1;
   }
 
@@ -939,6 +940,13 @@
   /* ============ NOW VIEW visibility ============ */
   body[data-mode="now"] .topbar,
   body[data-mode="now"] .people { display: none; }
+  body[data-mode="now"] .tabs {
+    background: transparent;
+    border-top-color: rgba(255,255,255,0.15);
+  }
+  body[data-mode="now"] .tab { color: rgba(255,255,255,0.45); }
+  body[data-mode="now"] .tab.active { color: rgba(255,255,255,0.95); }
+  body[data-mode="now"] .tab svg, body[data-mode="now"] .tab-icon { opacity: 0.6; }
 
   /* === Toast for tap event details === */
   /* event detail modal */
@@ -1745,7 +1753,23 @@
     return days === 1 ? 'tomorrow' : `in ${days}d`;
   }
 
+  function updateNowBg() {
+    const month = realNow().getMonth(); // 0=Jan..11=Dec
+    const persons = ['jordan','sarah','phoenix','lua'];
+    const key = persons[Math.floor(month / 3) % 4]; // season-based: Q1=jordan, Q2=sarah, Q3=phoenix, Q4=lua
+    const style = getComputedStyle(document.documentElement);
+    const bg   = style.getPropertyValue(`--${key}`).trim();
+    const text = style.getPropertyValue(`--${key}-text`).trim() || 'white';
+    const r = document.documentElement;
+    r.style.setProperty('--now-bg',   bg);
+    r.style.setProperty('--now-text', text);
+    r.style.setProperty('--now-meta', text === 'white'
+      ? 'rgba(255,255,255,0.45)'
+      : 'rgba(0,0,0,0.35)');
+  }
+
   function renderNow() {
+    updateNowBg();
     const now = realNow();
     const h = now.getHours();
     const m = now.getMinutes();
@@ -2194,6 +2218,7 @@
     document.querySelectorAll('.dev-pal').forEach(b =>
       b.classList.toggle('active', b.dataset.pal === key)
     );
+    updateNowBg();
   }
   document.querySelectorAll('.dev-pal').forEach(b =>
     b.addEventListener('click', () => applyPalette(b.dataset.pal))
