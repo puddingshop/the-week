@@ -80,30 +80,30 @@
     line-height: 1;
     user-select: none;
   }
-  .topdate .dow {
-    font-size: 16px;
-    font-weight: 200;
-    letter-spacing: -0.02em;
-    color: var(--ink);
+  .topdate .date-line {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
     line-height: 1;
+    margin-bottom: 3px;
   }
   .topdate .dnum {
     font-size: 26px;
     font-weight: 800;
-    letter-spacing: -0.03em;
     color: var(--ink);
-    margin-top: 3px;
     font-variant-numeric: tabular-nums;
-    line-height: 1;
   }
   .topdate .month {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    color: var(--mute);
-    text-transform: uppercase;
-    margin-top: 5px;
+    font-size: 16px;
+    font-weight: 200;
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
+  }
+  .topdate .dow {
+    font-size: 16px;
+    font-weight: 200;
+    color: var(--ink);
+    line-height: 1;
   }
 
   /* segmented view switcher */
@@ -1081,9 +1081,8 @@
 
     <div class="topbar">
       <div class="topdate" id="topdate">
-        <div class="dow" id="td-dow">FRI</div>
-        <div class="dnum" id="td-num">01</div>
-        <div class="month" id="td-mon">MAY 2026</div>
+        <div class="date-line"><span class="dnum" id="td-num">01</span> <span class="month" id="td-mon">May</span></div>
+        <div class="dow" id="td-dow">Saturday</div>
       </div>
       <div class="seg">
         <button class="seg-btn" data-mode="month" title="Month">
@@ -1797,8 +1796,8 @@
   function updateTopDate() {
     const now = realNow();
     document.getElementById('td-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
-    document.getElementById('td-num').textContent = `${now.getDate()} ${now.toLocaleDateString('en-US', { month: 'long' })}`;
-    document.getElementById('td-mon').textContent = now.getFullYear();
+    document.getElementById('td-num').textContent = now.getDate();
+    document.getElementById('td-mon').textContent = now.toLocaleDateString('en-US', { month: 'long' });
   }
 
   // ============================================================
