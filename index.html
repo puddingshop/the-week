@@ -459,6 +459,11 @@
     filter: saturate(0);
   }
 
+  /* single-day zoom: always show full colour system */
+  body[data-mode="day"] .ev               { filter: saturate(0.45); opacity: 0.72; }
+  body[data-mode="day"] .ev.next          { filter: none; opacity: 1; }
+  body[data-mode="day"] .ev.past          { filter: saturate(0.25); opacity: 0.15; }
+
   /* day-focus: tap a day header to reveal its colours */
   body[data-day-focus]:not([data-focus]) .col.focused-day .ev {
     filter: saturate(0.45);
@@ -1421,7 +1426,11 @@
       dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
       dh.addEventListener('click', (e) => {
         e.stopPropagation();
-        setDayFocus(off);
+        if (viewMode === 'day') {
+          setMode(prevNormalMode);
+        } else {
+          setMode('day', off);
+        }
       });
       headers.appendChild(dh);
     });
