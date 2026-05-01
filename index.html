@@ -22,10 +22,14 @@
     --hair: #efefef;
     --accent: #ff5e1f;
 
-    --jordan:  #E9C73A;
-    --sarah:   #E97A8E;
-    --phoenix: #8FCB45;
-    --lua:     #B49AE2;
+    --jordan:       #E9C73A;
+    --sarah:        #E97A8E;
+    --phoenix:      #8FCB45;
+    --lua:          #B49AE2;
+    --jordan-text:  #1a1a1a;
+    --sarah-text:   white;
+    --phoenix-text: #1a1a1a;
+    --lua-text:     white;
   }
 
   html, body {
@@ -154,7 +158,7 @@
     font-size: 11px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    border: 1.5px solid transparent;
+    border: 2px solid transparent;
     transition: all 0.18s ease;
   }
   .person-name {
@@ -164,10 +168,10 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
   }
-  .person[data-color="jordan"]  .avatar { background: var(--jordan);  }
-  .person[data-color="sarah"]   .avatar { background: var(--sarah);   color: white; }
-  .person[data-color="phoenix"] .avatar { background: var(--phoenix); }
-  .person[data-color="lua"]     .avatar { background: var(--lua);     color: white; }
+  .person[data-color="jordan"]  .avatar { background: transparent; border-color: var(--jordan);  color: var(--jordan); }
+  .person[data-color="sarah"]   .avatar { background: transparent; border-color: var(--sarah);   color: var(--sarah); }
+  .person[data-color="phoenix"] .avatar { background: transparent; border-color: var(--phoenix); color: var(--phoenix); }
+  .person[data-color="lua"]     .avatar { background: transparent; border-color: var(--lua);     color: var(--lua); }
 
   body[data-focus] .person:not(.focused) { opacity: 0.35; }
   .person.focused .avatar {
@@ -403,10 +407,10 @@
   .col.show-color .ev.next,
   .col.focused-day .ev.next { filter: none; opacity: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-  .col.show-color .ev.next[data-p="jordan"],  .col.focused-day .ev.next[data-p="jordan"]  { background: var(--jordan); }
-  .col.show-color .ev.next[data-p="sarah"],   .col.focused-day .ev.next[data-p="sarah"]   { background: var(--sarah);   color: white; }
-  .col.show-color .ev.next[data-p="phoenix"], .col.focused-day .ev.next[data-p="phoenix"] { background: var(--phoenix); }
-  .col.show-color .ev.next[data-p="lua"],     .col.focused-day .ev.next[data-p="lua"]     { background: var(--lua);     color: white; }
+  .col.show-color .ev.next[data-p="jordan"],  .col.focused-day .ev.next[data-p="jordan"]  { background: var(--jordan);  color: var(--jordan-text); }
+  .col.show-color .ev.next[data-p="sarah"],   .col.focused-day .ev.next[data-p="sarah"]   { background: var(--sarah);   color: var(--sarah-text); }
+  .col.show-color .ev.next[data-p="phoenix"], .col.focused-day .ev.next[data-p="phoenix"] { background: var(--phoenix); color: var(--phoenix-text); }
+  .col.show-color .ev.next[data-p="lua"],     .col.focused-day .ev.next[data-p="lua"]     { background: var(--lua);     color: var(--lua-text); }
   .col.show-color .ev.next[data-p="sarah"] .when,  .col.focused-day .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.8); }
   .col.show-color .ev.next[data-p="lua"] .when,    .col.focused-day .ev.next[data-p="lua"] .when   { color: rgba(255,255,255,0.8); }
 
@@ -1230,6 +1234,11 @@
   <div class="dev-row">
     <input type="range" id="dev-day" min="0" max="6" step="1" value="4">
     <span class="dev-val" id="dev-day-val">FRI</span>
+  </div>
+  <div class="dev-title">PALETTE</div>
+  <div class="dev-row dev-presets">
+    <button class="dev-preset dev-pal active" data-pal="bright">Bright</button>
+    <button class="dev-preset dev-pal" data-pal="muted">Purple</button>
   </div>
   <div class="dev-title">FRAME</div>
   <div class="dev-row">
@@ -2148,6 +2157,41 @@
   }
 
   // ============================================================
+  // DEV PANEL — palette switcher
+  // ============================================================
+  const PALETTES = {
+    bright: {
+      jordan: '#E9C73A', jordanText: '#1a1a1a',
+      sarah:  '#E97A8E', sarahText:  'white',
+      phoenix:'#8FCB45', phoenixText:'#1a1a1a',
+      lua:    '#B49AE2', luaText:    'white',
+    },
+    muted: {
+      jordan: '#CBC09F', jordanText: '#1a1a1a',
+      sarah:  '#8E76AA', sarahText:  'white',
+      phoenix:'#4B5672', phoenixText:'white',
+      lua:    '#4B2D68', luaText:    'white',
+    },
+  };
+  function applyPalette(key) {
+    const p = PALETTES[key];
+    const r = document.documentElement;
+    r.style.setProperty('--jordan',       p.jordan);
+    r.style.setProperty('--sarah',        p.sarah);
+    r.style.setProperty('--phoenix',      p.phoenix);
+    r.style.setProperty('--lua',          p.lua);
+    r.style.setProperty('--jordan-text',  p.jordanText);
+    r.style.setProperty('--sarah-text',   p.sarahText);
+    r.style.setProperty('--phoenix-text', p.phoenixText);
+    r.style.setProperty('--lua-text',     p.luaText);
+    document.querySelectorAll('.dev-pal').forEach(b =>
+      b.classList.toggle('active', b.dataset.pal === key)
+    );
+  }
+  document.querySelectorAll('.dev-pal').forEach(b =>
+    b.addEventListener('click', () => applyPalette(b.dataset.pal))
+  );
+
   // DEV PANEL — day simulator
   // ============================================================
   const SIM_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
