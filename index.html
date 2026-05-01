@@ -9,30 +9,27 @@
 
   :root {
     --bg: #ffffff;
-    --text: #1a1a1a;
-    --text-muted: #8a8a8a;
-    --text-faint: #b4b4b4;
-    --border: #ececec;
-    --border-light: #f4f4f4;
-    --accent: #ff5e1f; /* Rams orange */
+    --ink: #111111;
+    --ink-2: #4a4a4a;
+    --mute: #8a8a8a;
+    --faint: #b4b4b4;
+    --hair: #efefef;
+    --accent: #ff5e1f;
 
-    --jordan: #F5D547;
-    --jordan-text: #6B5A0F;
-    --sarah: #F08A9E;
-    --sarah-text: #7A2E3F;
-    --phoenix: #A4D65E;
-    --phoenix-text: #3F5C1A;
-    --lua: #C4A8E8;
-    --lua-text: #4A3873;
+    --jordan:  #E9C73A;
+    --sarah:   #E97A8E;
+    --phoenix: #8FCB45;
+    --lua:     #B49AE2;
   }
 
   html, body {
     height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'SF Pro Display', system-ui, sans-serif;
-    color: var(--text);
+    font-family: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    color: var(--ink);
     background: #d8d8d6;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   body {
     display: flex;
@@ -43,9 +40,9 @@
 
   .frame {
     background: var(--bg);
-    width: min(540px, calc(100vh * 9 / 16));
-    aspect-ratio: 9 / 16;
-    height: auto;
+    width: var(--frame-w, 540px);
+    height: var(--frame-h, 960px);
+    max-width: calc(100vw - 80px);
     max-height: calc(100vh - 64px);
     display: flex;
     flex-direction: column;
@@ -59,94 +56,121 @@
     position: relative;
   }
 
-  /* ---------- Top status bar ---------- */
+  /* ============ TOP BAR ============ */
   .topbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 18px 22px 6px;
+    justify-content: space-between;
+    padding: 16px 18px 10px;
     flex-shrink: 0;
   }
-  .weather {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-muted);
+  .topdate {
+    cursor: pointer;
+    line-height: 1;
+    user-select: none;
   }
-  .weather svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .clock-mini {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-muted);
+  .topdate .dow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .topdate .dnum {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-top: 4px;
     font-variant-numeric: tabular-nums;
   }
-
-  /* ---------- View switcher ---------- */
-  .view-switcher {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    padding: 8px 22px 10px;
-    flex-shrink: 0;
+  .topdate .month {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--mute);
+    text-transform: uppercase;
+    margin-top: 2px;
   }
-  .view-btn {
-    width: 32px;
-    height: 32px;
+
+  /* segmented view switcher */
+  .seg {
+    display: inline-flex;
+    background: #ececec;
+    padding: 3px;
+    border-radius: 10px;
+    gap: 1px;
+  }
+  .seg-btn {
+    width: 38px;
+    height: 28px;
+    border: none;
+    background: transparent;
     border-radius: 7px;
-    background: #f4f4f4;
-    border: 1px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #888;
-    transition: all 0.15s ease;
+    color: #777;
+    transition: all 0.18s ease;
   }
-  .view-btn:hover { background: #ececec; }
-  .view-btn.active {
-    background: #1a1a1a;
-    color: white;
+  .seg-btn:hover { color: var(--ink); }
+  .seg-btn.active {
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04);
   }
-  .view-btn svg { width: 18px; height: 18px; }
+  .seg-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---------- People legend ---------- */
+  /* ============ PEOPLE ============ */
   .people {
     display: flex;
     justify-content: center;
-    gap: 18px;
-    padding: 6px 22px 10px;
+    gap: 22px;
+    padding: 4px 18px 12px;
     flex-shrink: 0;
   }
   .person {
     text-align: center;
-    flex: 0 0 auto;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.18s ease, opacity 0.18s ease;
   }
   .avatar {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     margin: 0 auto 3px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    border: 1.5px solid transparent;
+    transition: all 0.18s ease;
   }
   .person-name {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--text-muted);
-    letter-spacing: 0.3px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
   }
-  .person[data-color="jordan"]  .avatar { background: var(--jordan);  color: var(--jordan-text); }
-  .person[data-color="sarah"]   .avatar { background: var(--sarah);   color: var(--sarah-text); }
-  .person[data-color="phoenix"] .avatar { background: var(--phoenix); color: var(--phoenix-text); }
-  .person[data-color="lua"]     .avatar { background: var(--lua);     color: var(--lua-text); }
+  .person[data-color="jordan"]  .avatar { background: var(--jordan);  }
+  .person[data-color="sarah"]   .avatar { background: var(--sarah);   color: white; }
+  .person[data-color="phoenix"] .avatar { background: var(--phoenix); }
+  .person[data-color="lua"]     .avatar { background: var(--lua);     color: white; }
 
-  /* ---------- Main content area ---------- */
+  body[data-focus] .person:not(.focused) { opacity: 0.35; }
+  .person.focused .avatar {
+    border-color: var(--ink);
+    transform: scale(1.12);
+  }
+  .person.focused .person-name { color: var(--ink); }
+
+  /* ============ MAIN CONTENT ============ */
   .content {
     flex: 1;
     display: flex;
@@ -155,7 +179,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .view {
     display: none;
     flex: 1;
@@ -164,314 +187,393 @@
   }
   .view.active { display: flex; }
 
-  /* ----- NOW view (Rams clock) ----- */
+  /* ============ NOW VIEW (Stendig/Rams) ============ */
   #view-now {
+    background: var(--bg);
+    padding: 20px 24px 24px;
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 32px;
-    gap: 14px;
+    justify-content: flex-start;
+    gap: 0;
   }
-  .now-day {
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--text-muted);
+  .now-meta {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--hair);
+  }
+  .now-dow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    letter-spacing: 4px;
+  }
+  .now-close {
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mute);
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .now-close:hover { color: var(--ink); }
+  .now-time-block {
+    flex: 0 0 auto;
+    padding: 36px 0 28px;
+    text-align: center;
   }
   .now-time {
-    font-size: 84px;
+    font-size: 110px;
     font-weight: 200;
-    letter-spacing: -4px;
+    letter-spacing: -0.06em;
+    line-height: 0.9;
     font-variant-numeric: tabular-nums;
-    line-height: 1;
-    color: var(--text);
+    color: var(--ink);
   }
   .now-time .ampm {
     font-size: 24px;
-    color: var(--text-muted);
-    margin-left: 8px;
+    color: var(--mute);
+    margin-left: 6px;
     letter-spacing: 0;
     vertical-align: top;
     position: relative;
-    top: 16px;
+    top: 18px;
   }
   .now-rule {
-    width: 60px;
+    width: 40px;
     height: 2px;
     background: var(--accent);
-    margin: 4px 0;
+    margin: 16px auto 16px;
   }
   .now-date {
-    font-size: 18px;
-    font-weight: 400;
-    color: var(--text);
-    letter-spacing: 0.5px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
   }
-  .now-weather {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 8px;
-    letter-spacing: 0.5px;
-  }
-
-  /* ----- Day view (single day timeline) ----- */
-  #view-day { padding: 0 22px 8px; }
-  .day-header {
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    padding: 0 0 6px;
-    letter-spacing: 0.5px;
-  }
-  .timeline {
-    flex: 1;
-    position: relative;
-    padding-left: 38px;
-    min-height: 0;
-  }
-  .hour-grid {
-    position: absolute;
-    inset: 0 0 0 38px;
+  .now-cards {
+    width: 100%;
+    margin-top: auto;
     display: flex;
     flex-direction: column;
+    gap: 6px;
   }
-  .hour-row {
+  .now-card-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    color: var(--mute);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .now-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .now-card:last-child { border-bottom: none; }
+  .now-card .swatch {
+    width: 4px;
+    height: 22px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .now-card .who {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    width: 60px;
+  }
+  .now-card .what {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
     flex: 1;
-    border-top: 1px solid var(--border-light);
+  }
+  .now-card .when {
+    font-size: 11px;
+    color: var(--mute);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+  }
+  .now-card.muted .who, .now-card.muted .what { color: var(--mute); }
+
+  /* ============ CALENDAR GRID ============ */
+  .cal {
+    flex: 1;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    padding: 0 14px 8px;
+    min-height: 0;
+  }
+  .day-headers {
+    display: grid;
+    padding-left: 26px;
+    margin-bottom: 4px;
+  }
+  .dh {
+    text-align: center;
+    cursor: pointer;
+    padding: 3px 2px 5px;
+  }
+  .dh .dh-dow {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--mute);
+    text-transform: uppercase;
+  }
+  .dh .dh-num {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+    margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .dh.today .dh-dow { color: var(--accent); }
+  .dh.today .dh-num { color: var(--accent); }
+
+  .grid-body {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  .hours {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .hour-mark {
+    flex: 1 1 0;
+    min-height: 0;
+    font-size: 8px;
+    font-weight: 500;
+    color: var(--faint);
+    text-align: right;
+    padding-right: 6px;
+    padding-top: 1px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+    border-top: 1px dashed transparent;
+  }
+  .columns {
+    display: grid;
+    position: relative;
+    height: 100%;
+  }
+  .col {
+    position: relative;
+    border-left: 1px solid var(--hair);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: flex 0.3s ease, opacity 0.18s ease;
+  }
+  .col:first-child { border-left: none; }
+  .col.today { background: rgba(255,94,31,0.025); }
+  .col .hour-cell {
+    flex: 1 1 0;
+    min-height: 0;
+    border-top: 1px solid var(--hair);
     position: relative;
   }
-  .hour-row.half { border-top: 1px dashed var(--border-light); }
-  .hour-row:first-child { border-top: none; }
-  .hour-label {
+  .col .hour-cell:first-child { border-top: none; }
+  .col .hour-cell::after {
+    content: '';
     position: absolute;
-    left: -38px;
-    top: -7px;
-    width: 32px;
-    text-align: right;
-    font-size: 9px;
-    color: var(--text-faint);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.5px;
+    left: 0; right: 0; top: 50%;
+    border-top: 1px dashed var(--hair);
+    opacity: 0.6;
   }
-  .events-layer {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-  .event {
-    position: absolute;
-    border-radius: 5px;
-    padding: 3px 6px;
-    font-size: 9.5px;
-    line-height: 1.2;
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  }
-  .event .title { font-weight: 600; }
-  .event .time { font-size: 8.5px; opacity: 0.75; }
-  .event.jordan  { background: var(--jordan);  color: var(--jordan-text); }
-  .event.sarah   { background: var(--sarah);   color: var(--sarah-text); }
-  .event.phoenix { background: var(--phoenix); color: var(--phoenix-text); }
-  .event.lua     { background: var(--lua);     color: var(--lua-text); }
 
+  /* events */
+  .ev {
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    border-radius: 4px;
+    padding: 3px 5px;
+    font-size: 9px;
+    line-height: 1.1;
+    overflow: hidden;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    cursor: pointer;
+    background: white;
+    border: 1.25px solid;
+    color: var(--ink);
+  }
+  .ev .t { font-weight: 600; font-size: 9px; letter-spacing: -0.01em; }
+  .ev .when { font-size: 8px; color: var(--mute); margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+  .ev[data-p="jordan"]  { border-color: var(--jordan); }
+  .ev[data-p="sarah"]   { border-color: var(--sarah); }
+  .ev[data-p="phoenix"] { border-color: var(--phoenix); }
+  .ev[data-p="lua"]     { border-color: var(--lua); }
+
+  /* state: next-up = saturated fill */
+  .ev.next[data-p="jordan"]  { background: var(--jordan);  }
+  .ev.next[data-p="sarah"]   { background: var(--sarah);   color: white; }
+  .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.8); }
+  .ev.next[data-p="phoenix"] { background: var(--phoenix); }
+  .ev.next[data-p="lua"]     { background: var(--lua);     color: white; }
+  .ev.next[data-p="lua"] .when { color: rgba(255,255,255,0.8); }
+  .ev.next { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* state: past = ghosted */
+  .ev.past { opacity: 0.18; }
+
+  /* state: focused away (some other person tapped) */
+  body[data-focus] .ev:not(.in-focus) {
+    opacity: 0.08;
+    border-color: var(--faint);
+    background: transparent !important;
+    color: var(--faint) !important;
+    box-shadow: none;
+  }
+  body[data-focus] .ev:not(.in-focus) .when { display: none; }
+
+  /* Now line */
   .now-line {
     position: absolute;
-    left: -6px;
+    left: 0;
     right: 0;
-    height: 1px;
+    height: 1.5px;
     background: var(--accent);
-    z-index: 10;
+    z-index: 8;
+    pointer-events: none;
   }
   .now-line::before {
     content: '';
     position: absolute;
     left: -3px;
-    top: -3px;
+    top: -2.5px;
     width: 7px;
     height: 7px;
     border-radius: 50%;
     background: var(--accent);
   }
 
-  /* ----- Multi-day view (2/5/7 day grid) ----- */
-  .multi-day { padding: 0 12px 8px; display: flex; flex-direction: column; }
-  .multi-header {
-    display: grid;
-    padding-left: 28px;
-    gap: 2px;
-    margin-bottom: 4px;
-    flex-shrink: 0;
-  }
-  .day-col-head {
-    text-align: center;
-    font-size: 10px;
-    color: var(--text-muted);
-    padding: 4px 0;
-    border-radius: 5px;
-    letter-spacing: 0.5px;
-  }
-  .day-col-head .dnum { font-size: 14px; font-weight: 600; color: var(--text); display: block; }
-  .day-col-head.today { background: rgba(255,94,31,0.08); color: var(--accent); }
-  .day-col-head.today .dnum { color: var(--accent); }
-
-  .multi-grid {
+  /* ============ CHORES VIEW ============ */
+  body[data-tab="calendar"] .calendar-shell { display: flex; }
+  body[data-tab="meals"]    .meals-shell    { display: flex; }
+  body[data-tab="shop"]     .shop-shell     { display: flex; }
+  body[data-tab="chores"]   .chores-shell   { display: flex; }
+  .calendar-shell, .meals-shell, .shop-shell, .chores-shell {
+    display: none;
+    flex-direction: column;
     flex: 1;
-    display: grid;
-    grid-template-columns: 28px 1fr;
     min-height: 0;
-    overflow: hidden;
   }
-  .multi-hours {
-    display: flex;
-    flex-direction: column;
-  }
-  .multi-hour-label {
-    flex: 1;
-    font-size: 8.5px;
-    color: var(--text-faint);
-    text-align: right;
-    padding-right: 6px;
-    padding-top: 1px;
-    border-top: 1px solid transparent;
-    font-variant-numeric: tabular-nums;
-  }
-  .multi-cols {
-    display: grid;
-    gap: 2px;
-    position: relative;
-  }
-  .day-col {
-    position: relative;
-    border-left: 1px solid var(--border-light);
-    display: flex;
-    flex-direction: column;
-  }
-  .day-col:first-child { border-left: none; }
-  .day-col .hour-cell {
-    flex: 1;
-    border-top: 1px solid var(--border-light);
-  }
-  .day-col .hour-cell:first-child { border-top: none; }
-  .day-col .multi-event {
-    position: absolute;
-    left: 1px;
-    right: 1px;
-    border-radius: 3px;
-    padding: 1px 3px;
-    font-size: 8px;
-    line-height: 1.15;
-    overflow: hidden;
-    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
-  }
-  .day-col .multi-event .title { font-weight: 600; font-size: 8px; }
-  .day-col .multi-event.jordan  { background: var(--jordan);  color: var(--jordan-text); }
-  .day-col .multi-event.sarah   { background: var(--sarah);   color: var(--sarah-text); }
-  .day-col .multi-event.phoenix { background: var(--phoenix); color: var(--phoenix-text); }
-  .day-col .multi-event.lua     { background: var(--lua);     color: var(--lua-text); }
 
-  /* ---------- Chores view ---------- */
-  #view-chores {
-    padding: 14px 22px 16px;
-    gap: 14px;
+  .chores-scroll {
+    flex: 1;
     overflow-y: auto;
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   .chore-card {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 14px 12px;
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    padding: 12px 12px 10px;
     background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
   }
   .chore-card-head {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 9px;
+    margin-bottom: 8px;
   }
-  .chore-card-head .avatar { width: 28px; height: 28px; font-size: 12px; margin: 0; }
-  .chore-card-head .name { font-size: 14px; font-weight: 600; }
+  .chore-card-head .avatar { width: 24px; height: 24px; font-size: 10px; margin: 0; border: none; }
+  .chore-card-head .name {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
   .chore-card-head .bal {
     margin-left: auto;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: var(--text);
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
-  .chore-list { display: flex; flex-direction: column; gap: 4px; }
+  .chore-list { display: flex; flex-direction: column; }
   .chore-item {
     display: grid;
-    grid-template-columns: 18px 1fr auto 22px;
-    gap: 6px;
+    grid-template-columns: 16px 1fr auto 18px;
+    gap: 7px;
     align-items: center;
-    padding: 4px 0;
-    border-bottom: 1px solid var(--border-light);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--hair);
   }
   .chore-item:last-child { border-bottom: none; }
   .chore-check {
-    width: 16px; height: 16px;
-    border: 1.5px solid #c0c0c0;
-    border-radius: 4px;
+    width: 14px; height: 14px;
+    border: 1.3px solid #c0c0c0;
+    border-radius: 3px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .chore-check.done { background: var(--text); border-color: var(--text); }
+  .chore-check.done { background: var(--ink); border-color: var(--ink); }
   .chore-check.done::after {
-    content: ''; width: 8px; height: 4px;
-    border-left: 1.5px solid white;
-    border-bottom: 1.5px solid white;
-    transform: rotate(-45deg) translate(1px,-1px);
+    content: ''; width: 6px; height: 3px;
+    border-left: 1.3px solid white;
+    border-bottom: 1.3px solid white;
+    transform: rotate(-45deg) translate(0.5px,-1px);
   }
   .chore-name {
     border: none; outline: none; background: transparent;
-    font-size: 13px; padding: 2px 0;
-    width: 100%;
-    color: var(--text);
-    font-family: inherit;
+    font-size: 12px; padding: 1px 0;
+    width: 100%; color: var(--ink); font-family: inherit;
   }
-  .chore-item.done .chore-name { text-decoration: line-through; color: var(--text-faint); }
+  .chore-item.done .chore-name { text-decoration: line-through; color: var(--faint); }
   .chore-price {
     border: none; outline: none; background: transparent;
-    font-size: 12px; padding: 2px 0;
-    text-align: right;
-    width: 50px;
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-    font-family: inherit;
+    font-size: 11px; padding: 1px 0;
+    text-align: right; width: 44px;
+    color: var(--mute); font-variant-numeric: tabular-nums; font-family: inherit;
   }
   .chore-del {
     background: none; border: none; cursor: pointer;
-    color: var(--text-faint);
-    font-size: 14px;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
+    color: var(--faint); font-size: 13px; line-height: 1;
+    padding: 1px 3px; border-radius: 3px;
   }
-  .chore-del:hover { color: #c64; background: #fff0eb; }
+  .chore-del:hover { color: #c64; }
   .chore-add {
-    margin-top: 8px;
-    background: none;
-    border: 1px dashed #d0d0d0;
-    border-radius: 6px;
-    padding: 6px;
-    font-size: 12px;
-    color: var(--text-muted);
-    cursor: pointer;
-    width: 100%;
-    font-family: inherit;
+    margin-top: 6px;
+    background: none; border: 1px dashed #d0d0d0; border-radius: 5px;
+    padding: 5px; font-size: 11px; color: var(--mute);
+    cursor: pointer; width: 100%; font-family: inherit;
+    letter-spacing: 0.1em; text-transform: uppercase;
   }
-  .chore-add:hover { border-color: var(--text); color: var(--text); }
+  .chore-add:hover { border-color: var(--ink); color: var(--ink); }
 
-  /* ---------- Bottom tabs ---------- */
+  /* ============ BOTTOM TABS ============ */
   .tabs {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 10px 22px 14px;
-    border-top: 1px solid var(--border);
+    padding: 8px 18px 12px;
+    border-top: 1px solid var(--hair);
     background: var(--bg);
     flex-shrink: 0;
   }
@@ -480,126 +582,190 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    font-size: 10px;
-    color: #b4b4b4;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--faint);
     cursor: pointer;
     transition: color 0.15s ease;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
   }
-  .tab svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .tab.active { color: #2a2a2a; }
+  .tab svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .tab.active { color: var(--ink); }
 
-  /* placeholder generic */
+  /* placeholder */
   .placeholder {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 10px;
-    color: var(--text-muted);
+    gap: 8px;
+    color: var(--mute);
     text-align: center;
     padding: 32px;
   }
-  .placeholder .label { font-size: 13px; max-width: 220px; line-height: 1.5; }
-  .placeholder .big { font-size: 32px; opacity: 0.4; }
+  .placeholder .label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .placeholder .sub { font-size: 12px; color: var(--faint); }
 
-  /* hide elements when in NOW or Chores etc */
-  body[data-mode="now"] .people,
-  body[data-mode="now"] .topbar { visibility: hidden; }
+  /* ============ NOW VIEW visibility ============ */
+  body[data-mode="now"] .topbar,
+  body[data-mode="now"] .people { display: none; }
 
-  body[data-tab="meals"] .calendar-shell,
-  body[data-tab="shop"] .calendar-shell,
-  body[data-tab="chores"] .calendar-shell { display: none; }
-  body[data-tab="meals"] .meals-shell,
-  body[data-tab="shop"] .shop-shell,
-  body[data-tab="chores"] .chores-shell { display: flex; flex-direction: column; flex: 1; min-height: 0; }
-  .meals-shell, .shop-shell, .chores-shell { display: none; }
+  /* === Toast for tap event details === */
+  .pin-bar {
+    position: absolute;
+    left: 14px; right: 14px;
+    bottom: 8px;
+    background: var(--ink);
+    color: white;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    z-index: 20;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  .pin-bar.shown { display: flex; }
+  .pin-bar .pin-swatch { width: 4px; height: 22px; border-radius: 2px; }
+  .pin-bar .pin-title { font-weight: 600; flex: 1; }
+  .pin-bar .pin-when { color: rgba(255,255,255,0.7); font-variant-numeric: tabular-nums; }
+  .pin-bar .pin-x { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+
+  /* ============ DEV PANEL ============ */
+  .dev-panel {
+    position: fixed;
+    bottom: 18px;
+    left: 18px;
+    background: rgba(20,20,20,0.78);
+    color: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 10.5px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    user-select: none;
+  }
+  .dev-panel .dev-title {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 2px;
+  }
+  .dev-row { display: flex; align-items: center; gap: 8px; }
+  .dev-row label {
+    width: 50px;
+    color: rgba(255,255,255,0.6);
+    font-size: 10px;
+  }
+  .dev-row input[type=range] {
+    width: 130px;
+    accent-color: var(--accent);
+  }
+  .dev-row .dev-val {
+    width: 38px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: white;
+  }
+  .dev-row .dev-preset {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 9.5px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .dev-row .dev-preset:hover { background: rgba(255,255,255,0.2); }
+  .dev-row .dev-preset.active { background: var(--accent); }
+  .dev-presets { gap: 4px; flex-wrap: wrap; }
 
 </style>
 </head>
-<body data-tab="calendar" data-mode="day">
+<body data-tab="calendar" data-mode="weekdays">
 
 <div class="frame">
 
-  <!-- ===== Calendar shell (default) ===== -->
-  <div class="calendar-shell" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+  <!-- ===== Calendar shell ===== -->
+  <div class="calendar-shell">
 
     <div class="topbar">
-      <div class="weather">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-        <span>22°</span>
+      <div class="topdate" id="topdate">
+        <div class="dow" id="td-dow">FRI</div>
+        <div class="dnum" id="td-num">01</div>
+        <div class="month" id="td-mon">MAY 2026</div>
       </div>
-      <div class="clock-mini" id="clock-mini">9:20 am</div>
+      <div class="seg">
+        <button class="seg-btn" data-mode="weekend" title="Weekend">
+          <svg viewBox="0 0 24 24"><rect x="6" y="5" width="5" height="14" rx="1"/><rect x="13" y="5" width="5" height="14" rx="1"/></svg>
+        </button>
+        <button class="seg-btn active" data-mode="weekdays" title="Weekdays">
+          <svg viewBox="0 0 24 24"><rect x="3" y="6" width="2.6" height="12" rx="0.6"/><rect x="6.8" y="6" width="2.6" height="12" rx="0.6"/><rect x="10.6" y="6" width="2.6" height="12" rx="0.6"/><rect x="14.4" y="6" width="2.6" height="12" rx="0.6"/><rect x="18.2" y="6" width="2.6" height="12" rx="0.6"/></svg>
+        </button>
+        <button class="seg-btn" data-mode="week" title="Full week">
+          <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="5.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="8.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="11.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="14.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="17.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="20.5" y="6" width="2.1" height="12" rx="0.5"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class="view-switcher">
-      <button class="view-btn" data-mode="now" title="Now">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-      </button>
-      <button class="view-btn active" data-mode="day" title="Day">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5" stroke-dasharray="2 2"/></svg>
-      </button>
-      <button class="view-btn" data-mode="weekend" title="Weekend">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="5" width="7" height="14" rx="1.5"/><rect x="13" y="5" width="7" height="14" rx="1.5"/></svg>
-      </button>
-      <button class="view-btn" data-mode="weekdays" title="Weekdays">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="3" height="12" rx="0.8"/><rect x="7.5" y="6" width="3" height="12" rx="0.8"/><rect x="12" y="6" width="3" height="12" rx="0.8"/><rect x="16.5" y="6" width="3" height="12" rx="0.8"/><rect x="20.5" y="6" width="2.4" height="12" rx="0.8" style="opacity:0.35"/></svg>
-      </button>
-      <button class="view-btn" data-mode="week" title="Full week">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2.5" y="6" width="2.2" height="12" rx="0.6"/><rect x="5.6" y="6" width="2.2" height="12" rx="0.6"/><rect x="8.7" y="6" width="2.2" height="12" rx="0.6"/><rect x="11.8" y="6" width="2.2" height="12" rx="0.6"/><rect x="14.9" y="6" width="2.2" height="12" rx="0.6"/><rect x="18.0" y="6" width="2.2" height="12" rx="0.6"/><rect x="21.1" y="6" width="2.2" height="12" rx="0.6"/></svg>
-      </button>
-    </div>
-
-    <div class="people" id="people-row">
-      <div class="person" data-color="jordan"><div class="avatar">J</div><div class="person-name">Jordan</div></div>
-      <div class="person" data-color="sarah"><div class="avatar">S</div><div class="person-name">Sarah</div></div>
-      <div class="person" data-color="phoenix"><div class="avatar">P</div><div class="person-name">Phoenix</div></div>
-      <div class="person" data-color="lua"><div class="avatar">L</div><div class="person-name">Lua</div></div>
+    <div class="people" id="people">
+      <div class="person" data-color="jordan"  data-p="jordan"><div class="avatar">J</div><div class="person-name">Jordan</div></div>
+      <div class="person" data-color="sarah"   data-p="sarah"><div class="avatar">S</div><div class="person-name">Sarah</div></div>
+      <div class="person" data-color="phoenix" data-p="phoenix"><div class="avatar">P</div><div class="person-name">Phoenix</div></div>
+      <div class="person" data-color="lua"     data-p="lua"><div class="avatar">L</div><div class="person-name">Lua</div></div>
     </div>
 
     <div class="content">
 
       <!-- NOW -->
       <div class="view" id="view-now">
-        <div class="now-day" id="now-day">Friday</div>
-        <div class="now-time" id="now-time">9:20<span class="ampm" id="now-ampm">am</span></div>
-        <div class="now-rule"></div>
-        <div class="now-date" id="now-date">1 May 2026</div>
-        <div class="now-weather">22° · Sunny · Adelaide</div>
-      </div>
-
-      <!-- DAY -->
-      <div class="view active" id="view-day">
-        <div class="day-header" id="day-header">Friday, May 1</div>
-        <div class="timeline" id="day-timeline"></div>
-      </div>
-
-      <!-- WEEKEND (2 days) -->
-      <div class="view multi-day" id="view-weekend">
-        <div class="multi-header" id="weekend-header"></div>
-        <div class="multi-grid">
-          <div class="multi-hours" id="weekend-hours"></div>
-          <div class="multi-cols" id="weekend-cols"></div>
+        <div class="now-meta">
+          <div class="now-dow" id="now-dow">FRIDAY</div>
+          <button class="now-close" id="now-close">CLOSE</button>
+        </div>
+        <div class="now-time-block">
+          <div class="now-time" id="now-time">9:20<span class="ampm" id="now-ampm">am</span></div>
+          <div class="now-rule"></div>
+          <div class="now-date" id="now-date">1 MAY 2026</div>
+        </div>
+        <div class="now-cards" id="now-cards">
+          <div class="now-card-label">Next up</div>
         </div>
       </div>
 
-      <!-- WEEKDAYS (5 days) -->
-      <div class="view multi-day" id="view-weekdays">
-        <div class="multi-header" id="weekdays-header"></div>
-        <div class="multi-grid">
-          <div class="multi-hours" id="weekdays-hours"></div>
-          <div class="multi-cols" id="weekdays-cols"></div>
+      <!-- CALENDAR (single grid that re-renders for any day count) -->
+      <div class="view active" id="view-cal">
+        <div class="cal">
+          <div class="day-headers" id="day-headers"></div>
+          <div class="grid-body">
+            <div class="hours" id="hours"></div>
+            <div class="columns" id="columns"></div>
+          </div>
         </div>
       </div>
 
-      <!-- WEEK (7 days) -->
-      <div class="view multi-day" id="view-week">
-        <div class="multi-header" id="week-header"></div>
-        <div class="multi-grid">
-          <div class="multi-hours" id="week-hours"></div>
-          <div class="multi-cols" id="week-cols"></div>
-        </div>
+      <div class="pin-bar" id="pin-bar">
+        <div class="pin-swatch" id="pin-swatch"></div>
+        <div class="pin-title" id="pin-title"></div>
+        <div class="pin-when" id="pin-when"></div>
+        <button class="pin-x" id="pin-x">×</button>
       </div>
 
     </div>
@@ -608,22 +774,22 @@
   <!-- ===== Meals shell ===== -->
   <div class="meals-shell">
     <div class="placeholder">
-      <div class="big">▢</div>
-      <div class="label"><strong>Meals</strong><br>Weekly meal plan & recipes — coming soon.</div>
+      <div class="label">Meals</div>
+      <div class="sub">Weekly meal plan — coming soon</div>
     </div>
   </div>
 
   <!-- ===== Shop shell ===== -->
   <div class="shop-shell">
     <div class="placeholder">
-      <div class="big">▢</div>
-      <div class="label"><strong>Shop</strong><br>Shared shopping list — coming soon.</div>
+      <div class="label">Shop</div>
+      <div class="sub">Shared shopping list — coming soon</div>
     </div>
   </div>
 
   <!-- ===== Chores shell ===== -->
   <div class="chores-shell">
-    <div id="view-chores"></div>
+    <div class="chores-scroll" id="chores-scroll"></div>
   </div>
 
   <!-- ===== Bottom tab bar ===== -->
@@ -648,43 +814,60 @@
 
 </div>
 
+<!-- ============ DEV PANEL (in grey area) ============ -->
+<div class="dev-panel">
+  <div class="dev-title">FRAME</div>
+  <div class="dev-row">
+    <label>Width</label>
+    <input type="range" id="dev-w" min="320" max="700" step="10" value="540">
+    <span class="dev-val" id="dev-w-val">540</span>
+  </div>
+  <div class="dev-row">
+    <label>Height</label>
+    <input type="range" id="dev-h" min="600" max="1400" step="10" value="960">
+    <span class="dev-val" id="dev-h-val">960</span>
+  </div>
+  <div class="dev-row dev-presets">
+    <button class="dev-preset" data-w="540" data-h="960">9:16</button>
+    <button class="dev-preset" data-w="600" data-h="800">3:4</button>
+    <button class="dev-preset" data-w="540" data-h="1080">1:2</button>
+    <button class="dev-preset" data-w="600" data-h="1200">Skylight</button>
+  </div>
+</div>
+
 <script>
   // ============================================================
-  // Sample events. Each event has { person, title, start, end, dayOffset }
-  // dayOffset = 0 means today, 1 = tomorrow, -1 = yesterday, etc.
-  // Replace later with live Google Calendar feed.
+  // SAMPLE EVENTS
   // ============================================================
+  // dayOffset: 0 = today, +1 = tomorrow, etc.
   const events = [
     // today
-    { person: 'sarah',   title: 'Yoga',         start: '07:00', end: '08:00', dayOffset: 0 },
-    { person: 'jordan',  title: 'Standup',      start: '09:00', end: '09:30', dayOffset: 0 },
-    { person: 'phoenix', title: 'School',       start: '09:00', end: '15:00', dayOffset: 0 },
-    { person: 'lua',     title: 'School',       start: '09:00', end: '15:00', dayOffset: 0 },
-    { person: 'jordan',  title: 'Design rev',   start: '10:30', end: '11:30', dayOffset: 0 },
-    { person: 'sarah',   title: 'Client call',  start: '11:00', end: '12:00', dayOffset: 0 },
-    { person: 'jordan',  title: 'Lunch',        start: '12:30', end: '13:30', dayOffset: 0 },
-    { person: 'sarah',   title: 'Pilates',      start: '14:00', end: '15:00', dayOffset: 0 },
-    { person: 'phoenix', title: 'Soccer',       start: '16:00', end: '17:00', dayOffset: 0 },
-    { person: 'lua',     title: 'Piano',        start: '16:30', end: '17:15', dayOffset: 0 },
-    { person: 'jordan',  title: 'Family dinner',start: '18:00', end: '19:00', dayOffset: 0 },
-    { person: 'sarah',   title: 'Family dinner',start: '18:00', end: '19:00', dayOffset: 0 },
-    { person: 'phoenix', title: 'Family dinner',start: '18:00', end: '19:00', dayOffset: 0 },
-    { person: 'lua',     title: 'Family dinner',start: '18:00', end: '19:00', dayOffset: 0 },
+    { p: 'sarah',   t: 'Yoga',         start: '07:00', end: '08:00', d: 0 },
+    { p: 'jordan',  t: 'Standup',      start: '09:00', end: '09:30', d: 0 },
+    { p: 'phoenix', t: 'School',       start: '09:00', end: '15:00', d: 0 },
+    { p: 'lua',     t: 'School',       start: '09:00', end: '15:00', d: 0 },
+    { p: 'jordan',  t: 'Design rev',   start: '10:30', end: '11:30', d: 0 },
+    { p: 'sarah',   t: 'Client call',  start: '11:00', end: '12:00', d: 0 },
+    { p: 'jordan',  t: 'Lunch',        start: '12:30', end: '13:30', d: 0 },
+    { p: 'sarah',   t: 'Pilates',      start: '14:00', end: '15:00', d: 0 },
+    { p: 'phoenix', t: 'Soccer',       start: '16:00', end: '17:00', d: 0 },
+    { p: 'lua',     t: 'Piano',        start: '16:30', end: '17:15', d: 0 },
+    { p: 'jordan',  t: 'Family dinner',start: '18:00', end: '19:00', d: 0 },
     // tomorrow
-    { person: 'phoenix', title: 'Birthday party', start: '14:00', end: '17:00', dayOffset: 1 },
-    { person: 'jordan',  title: 'Run',           start: '07:30', end: '08:30', dayOffset: 1 },
-    { person: 'sarah',   title: 'Brunch',        start: '10:00', end: '12:00', dayOffset: 1 },
+    { p: 'phoenix', t: 'Birthday party', start: '14:00', end: '17:00', d: 1 },
+    { p: 'jordan',  t: 'Run',           start: '07:30', end: '08:30', d: 1 },
+    { p: 'sarah',   t: 'Brunch',        start: '10:00', end: '12:00', d: 1 },
     // sunday
-    { person: 'lua',     title: 'Swim lesson',   start: '09:00', end: '10:00', dayOffset: 2 },
-    { person: 'sarah',   title: 'Hike',          start: '08:00', end: '11:00', dayOffset: 2 },
-    // monday
-    { person: 'jordan',  title: 'Workshop',      start: '10:00', end: '12:00', dayOffset: 3 },
-    { person: 'phoenix', title: 'School',        start: '09:00', end: '15:00', dayOffset: 3 },
-    { person: 'lua',     title: 'School',        start: '09:00', end: '15:00', dayOffset: 3 },
+    { p: 'lua',     t: 'Swim lesson',   start: '09:00', end: '10:00', d: 2 },
+    { p: 'sarah',   t: 'Hike',          start: '08:00', end: '11:00', d: 2 },
+    // mon
+    { p: 'jordan',  t: 'Workshop',      start: '10:00', end: '12:00', d: 3 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 3 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 3 },
     // tues
-    { person: 'sarah',   title: 'Dentist',       start: '11:00', end: '12:00', dayOffset: 4 },
-    { person: 'phoenix', title: 'School',        start: '09:00', end: '15:00', dayOffset: 4 },
-    { person: 'lua',     title: 'School',        start: '09:00', end: '15:00', dayOffset: 4 },
+    { p: 'sarah',   t: 'Dentist',       start: '11:00', end: '12:00', d: 4 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 4 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 4 },
   ];
 
   const START_HOUR = 6;
@@ -701,130 +884,113 @@
     const ampm = h < 12 ? 'a' : 'p';
     return m === 0 ? `${hr}${ampm}` : `${hr}:${String(m).padStart(2,'0')}${ampm}`;
   }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  // For testing — set a "fake now" so demo events look interactive.
+  // Set to null to use real time.
+  const FAKE_NOW = new Date();
+  FAKE_NOW.setHours(11, 15, 0, 0);
+  function realNow() { return FAKE_NOW || new Date(); }
 
   // ============================================================
-  // DAY VIEW (single day, lane-based)
+  // STATE
   // ============================================================
-  function renderDay() {
-    const tl = document.getElementById('day-timeline');
-    tl.innerHTML = '';
+  let focusedPerson = null; // 'jordan', 'sarah', etc, or null
+  let pinned = null;
+  let viewDayCount = 5; // 2/5/7
+  let viewMode = 'weekdays'; // weekend / weekdays / week / now
 
-    // hour grid
-    const grid = document.createElement('div');
-    grid.className = 'hour-grid';
-    for (let h = START_HOUR; h <= END_HOUR; h++) {
-      const row = document.createElement('div');
-      row.className = 'hour-row';
-      const lab = document.createElement('div');
-      lab.className = 'hour-label';
-      const hr = h === 0 ? 12 : (h > 12 ? h - 12 : h);
-      const ampm = h < 12 ? 'AM' : 'PM';
-      lab.textContent = `${hr} ${ampm}`;
-      row.appendChild(lab);
-      grid.appendChild(row);
+  // ============================================================
+  // DAY OFFSETS HELPERS
+  // ============================================================
+  function offsetsForMode(mode) {
+    const today = realNow().getDay(); // 0=Sun..6=Sat
+    if (mode === 'weekend') {
+      let satOffset = (6 - today + 7) % 7;
+      if (today === 0) satOffset = -1;
+      if (today === 6) satOffset = 0;
+      return [satOffset, satOffset + 1];
     }
-    tl.appendChild(grid);
-
-    const layer = document.createElement('div');
-    layer.className = 'events-layer';
-    tl.appendChild(layer);
-
-    const today = events.filter(e => e.dayOffset === 0);
-    const sorted = [...today].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
-    const lanes = [];
-    sorted.forEach(ev => {
-      const s = timeToMinutes(ev.start);
-      const e = timeToMinutes(ev.end);
-      let placed = false;
-      for (let i = 0; i < lanes.length; i++) {
-        if (lanes[i] <= s) { ev._lane = i; lanes[i] = e; placed = true; break; }
-      }
-      if (!placed) { ev._lane = lanes.length; lanes.push(e); }
-    });
-    const totalLanes = Math.max(lanes.length, 1);
-
-    sorted.forEach(ev => {
-      const sMin = timeToMinutes(ev.start) - START_HOUR * 60;
-      const eMin = timeToMinutes(ev.end) - START_HOUR * 60;
-      const topPct = (sMin / (TOTAL_HOURS * 60)) * 100;
-      const heightPct = ((eMin - sMin) / (TOTAL_HOURS * 60)) * 100;
-      const widthPct = 100 / totalLanes;
-      const leftPct = ev._lane * widthPct;
-      const el = document.createElement('div');
-      el.className = `event ${ev.person}`;
-      el.style.top = `${topPct}%`;
-      el.style.height = `calc(${heightPct}% - 2px)`;
-      el.style.left = `calc(${leftPct}% + 2px)`;
-      el.style.width = `calc(${widthPct}% - 4px)`;
-      el.innerHTML = `<div class="title">${ev.title}</div><div class="time">${fmtTime(ev.start)}–${fmtTime(ev.end)}</div>`;
-      layer.appendChild(el);
-    });
-
-    drawNowLine(layer);
-  }
-
-  function drawNowLine(layer) {
-    const now = new Date();
-    const minsFromStart = (now.getHours() - START_HOUR) * 60 + now.getMinutes();
-    if (minsFromStart < 0 || minsFromStart > TOTAL_HOURS * 60) return;
-    const topPct = (minsFromStart / (TOTAL_HOURS * 60)) * 100;
-    const line = document.createElement('div');
-    line.className = 'now-line';
-    line.style.top = `${topPct}%`;
-    layer.appendChild(line);
+    if (mode === 'weekdays') {
+      const mondayOffset = today === 0 ? -6 : (1 - today);
+      return [0,1,2,3,4].map(i => mondayOffset + i);
+    }
+    if (mode === 'week') {
+      const mondayOffset = today === 0 ? -6 : (1 - today);
+      return [0,1,2,3,4,5,6].map(i => mondayOffset + i);
+    }
+    return [0,1,2,3,4];
   }
 
   // ============================================================
-  // MULTI-DAY VIEW
+  // RENDER CALENDAR
   // ============================================================
-  function renderMulti(viewKey, dayOffsets) {
-    const header = document.getElementById(`${viewKey}-header`);
-    const hoursCol = document.getElementById(`${viewKey}-hours`);
-    const cols = document.getElementById(`${viewKey}-cols`);
+  function renderCalendar() {
+    const offsets = offsetsForMode(viewMode);
+    const headers = document.getElementById('day-headers');
+    const hoursCol = document.getElementById('hours');
+    const cols = document.getElementById('columns');
 
-    const today = new Date();
-    const todayDow = today.getDay(); // 0=Sun..6=Sat
-
-    header.innerHTML = '';
+    headers.innerHTML = '';
     hoursCol.innerHTML = '';
     cols.innerHTML = '';
 
-    header.style.gridTemplateColumns = `repeat(${dayOffsets.length}, 1fr)`;
-    cols.style.gridTemplateColumns = `repeat(${dayOffsets.length}, 1fr)`;
+    headers.style.gridTemplateColumns = `repeat(${offsets.length}, 1fr)`;
+    cols.style.gridTemplateColumns = `repeat(${offsets.length}, 1fr)`;
 
-    // header day cells
-    dayOffsets.forEach(off => {
-      const d = new Date();
+    // headers
+    offsets.forEach(off => {
+      const d = new Date(realNow().getTime());
       d.setDate(d.getDate() + off);
-      const dn = d.toLocaleDateString('en-US', { weekday: 'short' });
-      const day = d.getDate();
-      const cell = document.createElement('div');
-      cell.className = 'day-col-head' + (off === 0 ? ' today' : '');
-      cell.innerHTML = `${dn}<span class="dnum">${day}</span>`;
-      header.appendChild(cell);
+      const isToday = off === 0;
+      const dh = document.createElement('div');
+      dh.className = 'dh' + (isToday ? ' today' : '');
+      dh.dataset.offset = off;
+      const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+      const dnum = d.getDate();
+      dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
+      dh.addEventListener('click', () => { /* future: zoom to single day */ });
+      headers.appendChild(dh);
     });
 
     // hour labels
     for (let h = START_HOUR; h < END_HOUR; h++) {
       const lab = document.createElement('div');
-      lab.className = 'multi-hour-label';
+      lab.className = 'hour-mark';
       const hr = h === 0 ? 12 : (h > 12 ? h - 12 : h);
       const ampm = h < 12 ? 'a' : 'p';
       lab.textContent = `${hr}${ampm}`;
       hoursCol.appendChild(lab);
     }
 
-    // day columns with hour cells
-    dayOffsets.forEach(off => {
+    // figure out next-up event per person (today + future, end > now)
+    const nowMins = realNow().getHours() * 60 + realNow().getMinutes();
+    const nextUp = {};
+    const sortedAll = [...events].sort((a, b) => {
+      if (a.d !== b.d) return a.d - b.d;
+      return timeToMinutes(a.start) - timeToMinutes(b.start);
+    });
+    sortedAll.forEach(ev => {
+      if (nextUp[ev.p]) return;
+      // is this event still upcoming?
+      if (ev.d > 0) { nextUp[ev.p] = ev; return; }
+      if (ev.d === 0 && timeToMinutes(ev.end) > nowMins) {
+        nextUp[ev.p] = ev; return;
+      }
+    });
+
+    // columns + events
+    offsets.forEach(off => {
+      const isToday = off === 0;
       const col = document.createElement('div');
-      col.className = 'day-col';
+      col.className = 'col' + (isToday ? ' today' : '');
       for (let h = START_HOUR; h < END_HOUR; h++) {
         const cell = document.createElement('div');
         cell.className = 'hour-cell';
         col.appendChild(cell);
       }
       // events for this day
-      const dayEvents = events.filter(e => e.dayOffset === off);
+      const dayEvents = events.filter(e => e.d === off);
       const sorted = [...dayEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
       const lanes = [];
       sorted.forEach(ev => {
@@ -844,52 +1010,216 @@
         const heightPct = ((eMin - sMin) / (TOTAL_HOURS * 60)) * 100;
         const widthPct = 100 / totalLanes;
         const leftPct = ev._lane * widthPct;
+
+        const isPast = (ev.d === 0 && timeToMinutes(ev.end) <= nowMins) || ev.d < 0;
+        const isNext = nextUp[ev.p] === ev;
+        const inFocus = focusedPerson ? ev.p === focusedPerson : true;
+
         const el = document.createElement('div');
-        el.className = `multi-event ${ev.person}`;
+        el.className = 'ev';
+        if (isNext) el.classList.add('next');
+        if (isPast) el.classList.add('past');
+        if (inFocus) el.classList.add('in-focus');
+        el.dataset.p = ev.p;
         el.style.top = `${topPct}%`;
         el.style.height = `calc(${heightPct}% - 1px)`;
         el.style.left = `calc(${leftPct}% + 1px)`;
         el.style.width = `calc(${widthPct}% - 2px)`;
-        el.innerHTML = `<div class="title">${ev.title}</div>`;
+
+        // text — only show "when" if event is tall enough
+        const showWhen = heightPct > 5.5;
+        el.innerHTML = `<div class="t">${ev.t}</div>${showWhen ? `<div class="when">${fmtTime(ev.start)}</div>` : ''}`;
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          pinEvent(ev);
+        });
         col.appendChild(el);
       });
       cols.appendChild(col);
     });
+
+    // now line on today's column only
+    const todayIndex = offsets.indexOf(0);
+    if (todayIndex >= 0) {
+      const minsFromStart = nowMins - START_HOUR * 60;
+      if (minsFromStart >= 0 && minsFromStart <= TOTAL_HOURS * 60) {
+        const topPct = (minsFromStart / (TOTAL_HOURS * 60)) * 100;
+        const colWidth = 100 / offsets.length;
+        const line = document.createElement('div');
+        line.className = 'now-line';
+        line.style.top = `${topPct}%`;
+        line.style.left = `calc(${todayIndex * colWidth}% + 0px)`;
+        line.style.right = `calc(${(offsets.length - todayIndex - 1) * colWidth}% + 0px)`;
+        cols.appendChild(line);
+      }
+    }
   }
 
-  // figure out date offsets
-  function weekendOffsets() {
-    const today = new Date().getDay(); // 0=Sun
-    // find next Saturday
-    let satOffset = (6 - today + 7) % 7;
-    if (today === 6) satOffset = 0;
-    if (today === 0) satOffset = -1; // if Sunday, show yesterday-Sat + today
-    return [satOffset, satOffset + 1];
+  // ============================================================
+  // FOCUS (tap avatar)
+  // ============================================================
+  function setFocus(person) {
+    focusedPerson = person;
+    document.querySelectorAll('.person').forEach(el => {
+      el.classList.toggle('focused', el.dataset.p === person);
+    });
+    if (person) document.body.dataset.focus = person;
+    else delete document.body.dataset.focus;
+    renderCalendar();
   }
-  function weekdaysOffsets() {
-    const today = new Date().getDay();
-    // Mon = 1
-    const mondayOffset = today === 0 ? -6 : (1 - today);
-    return [0,1,2,3,4].map(i => mondayOffset + i);
+
+  document.querySelectorAll('.person').forEach(p => {
+    p.addEventListener('click', () => {
+      const name = p.dataset.p;
+      setFocus(focusedPerson === name ? null : name);
+    });
+  });
+
+  // tap empty content area releases focus
+  document.getElementById('view-cal').addEventListener('click', (e) => {
+    if (e.target.classList.contains('cal') || e.target.classList.contains('grid-body') || e.target.classList.contains('columns') || e.target.classList.contains('col') || e.target.classList.contains('hour-cell')) {
+      if (focusedPerson) setFocus(null);
+    }
+  });
+
+  // ============================================================
+  // PIN EVENT
+  // ============================================================
+  function pinEvent(ev) {
+    pinned = ev;
+    const bar = document.getElementById('pin-bar');
+    const sw = document.getElementById('pin-swatch');
+    sw.style.background = `var(--${ev.p})`;
+    document.getElementById('pin-title').textContent = `${ev.p[0].toUpperCase()}${ev.p.slice(1)} · ${ev.t}`;
+    document.getElementById('pin-when').textContent = `${fmtTime(ev.start)}–${fmtTime(ev.end)}`;
+    bar.classList.add('shown');
   }
-  function fullWeekOffsets() {
-    const today = new Date().getDay();
-    const mondayOffset = today === 0 ? -6 : (1 - today);
-    return [0,1,2,3,4,5,6].map(i => mondayOffset + i);
+  document.getElementById('pin-x').addEventListener('click', () => {
+    document.getElementById('pin-bar').classList.remove('shown');
+    pinned = null;
+  });
+
+  // ============================================================
+  // VIEW MODE SWITCH
+  // ============================================================
+  function setMode(mode) {
+    viewMode = mode;
+    document.body.dataset.mode = mode;
+    document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    if (mode === 'now') {
+      document.getElementById('view-now').classList.add('active');
+      renderNow();
+    } else {
+      document.getElementById('view-cal').classList.add('active');
+      renderCalendar();
+    }
   }
+  document.querySelectorAll('.seg-btn').forEach(b => {
+    b.addEventListener('click', () => setMode(b.dataset.mode));
+  });
+
+  // tap top date → NOW
+  document.getElementById('topdate').addEventListener('click', () => setMode('now'));
+  document.getElementById('now-close').addEventListener('click', () => setMode('weekdays'));
+
+  // ============================================================
+  // NOW VIEW
+  // ============================================================
+  function timeUntil(ev) {
+    const now = realNow();
+    const target = new Date(now);
+    target.setDate(target.getDate() + ev.d);
+    const [h, m] = ev.start.split(':').map(Number);
+    target.setHours(h, m, 0, 0);
+    const diffMin = Math.round((target - now) / 60000);
+    if (diffMin < 0) {
+      const endTarget = new Date(target);
+      const [eh, em] = ev.end.split(':').map(Number);
+      endTarget.setHours(eh, em, 0, 0);
+      if (endTarget > now) return 'now';
+      return 'past';
+    }
+    if (diffMin < 60) return `in ${diffMin}m`;
+    const hrs = Math.floor(diffMin / 60);
+    const mins = diffMin % 60;
+    if (hrs < 24) return mins ? `in ${hrs}h ${mins}m` : `in ${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    return days === 1 ? 'tomorrow' : `in ${days}d`;
+  }
+
+  function renderNow() {
+    const now = realNow();
+    let h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h < 12 ? 'am' : 'pm';
+    const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    document.getElementById('now-time').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
+    document.getElementById('now-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    document.getElementById('now-date').textContent = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+
+    const root = document.getElementById('now-cards');
+    root.innerHTML = '<div class="now-card-label">Next up</div>';
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    const nextByPerson = {};
+    const sortedAll = [...events].sort((a, b) => {
+      if (a.d !== b.d) return a.d - b.d;
+      return timeToMinutes(a.start) - timeToMinutes(b.start);
+    });
+    sortedAll.forEach(ev => {
+      if (nextByPerson[ev.p]) return;
+      if (ev.d > 0) { nextByPerson[ev.p] = ev; return; }
+      if (ev.d === 0 && timeToMinutes(ev.end) > nowMins) {
+        nextByPerson[ev.p] = ev; return;
+      }
+    });
+    ['jordan','sarah','phoenix','lua'].forEach(person => {
+      const ev = nextByPerson[person];
+      const card = document.createElement('div');
+      card.className = 'now-card' + (ev ? '' : ' muted');
+      const swatch = `<div class="swatch" style="background: var(--${person});"></div>`;
+      const who = `${person[0].toUpperCase()}${person.slice(1)}`;
+      const what = ev ? ev.t : 'nothing scheduled';
+      const when = ev ? timeUntil(ev) : '—';
+      card.innerHTML = `${swatch}<div class="who">${who}</div><div class="what">${what}</div><div class="when">${when}</div>`;
+      root.appendChild(card);
+    });
+  }
+
+  // ============================================================
+  // TOP DATE
+  // ============================================================
+  function updateTopDate() {
+    const now = realNow();
+    document.getElementById('td-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    document.getElementById('td-num').textContent = pad2(now.getDate());
+    document.getElementById('td-mon').textContent = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+  }
+
+  // ============================================================
+  // TAB SWITCHING
+  // ============================================================
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.body.dataset.tab = t.dataset.tab;
+      if (t.dataset.tab === 'chores') renderChores();
+    });
+  });
 
   // ============================================================
   // CHORES
   // ============================================================
-  const CHORES_KEY = 'theweek.chores.v1';
+  const CHORES_KEY = 'theweek.chores.v2';
   const defaultChores = {
     phoenix: [
-      { name: 'Make bed', price: 0.50, done: false },
-      { name: 'Feed dog', price: 1.00, done: false },
+      { name: 'Make bed',  price: 0.50, done: false },
+      { name: 'Feed dog',  price: 1.00, done: false },
       { name: 'Tidy room', price: 2.00, done: false },
     ],
     lua: [
-      { name: 'Make bed', price: 0.50, done: false },
+      { name: 'Make bed',       price: 0.50, done: false },
       { name: 'Pack lunch box', price: 1.00, done: false },
     ],
   };
@@ -901,7 +1231,7 @@
   let choreState = loadChores();
 
   function renderChores() {
-    const root = document.getElementById('view-chores');
+    const root = document.getElementById('chores-scroll');
     root.innerHTML = '';
     ['phoenix','lua'].forEach(person => {
       const card = document.createElement('div');
@@ -910,9 +1240,10 @@
       const name = person[0].toUpperCase() + person.slice(1);
       const items = choreState[person] || [];
       const total = items.filter(i => i.done).reduce((s, i) => s + (Number(i.price) || 0), 0);
+      const isWhite = (person === 'lua');
       card.innerHTML = `
         <div class="chore-card-head">
-          <div class="avatar" style="background: var(--${person}); color: var(--${person}-text);">${initial}</div>
+          <div class="avatar" style="background: var(--${person}); ${isWhite?'color:white;':''}">${initial}</div>
           <div class="name">${name}</div>
           <div class="bal">$${total.toFixed(2)}</div>
         </div>
@@ -950,74 +1281,55 @@
       card.querySelector('.chore-add').addEventListener('click', () => {
         choreState[person].push({ name: '', price: 0, done: false });
         saveChores(choreState); renderChores();
-        // focus the new input
-        setTimeout(() => {
-          const inputs = document.querySelectorAll(`.chores-shell .chore-card`);
-          // best effort
-        }, 0);
       });
       root.appendChild(card);
     });
   }
 
   // ============================================================
-  // CLOCK + DATE
+  // DEV PANEL — frame size controls
   // ============================================================
-  function pad2(n){ return String(n).padStart(2,'0'); }
-  function updateClock() {
-    const now = new Date();
-    let h = now.getHours();
-    const m = now.getMinutes();
-    const ampm = h < 12 ? 'am' : 'pm';
-    const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
-    document.getElementById('clock-mini').textContent = `${h12}:${pad2(m)} ${ampm}`;
-    document.getElementById('now-time').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
-    document.getElementById('now-day').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
-    document.getElementById('now-date').textContent = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-    document.getElementById('day-header').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  }
-
-  // ============================================================
-  // VIEW SWITCHING
-  // ============================================================
-  function setMode(mode) {
-    document.body.dataset.mode = mode;
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(`view-${mode}`).classList.add('active');
-
-    if (mode === 'day') renderDay();
-    if (mode === 'weekend') renderMulti('weekend', weekendOffsets());
-    if (mode === 'weekdays') renderMulti('weekdays', weekdaysOffsets());
-    if (mode === 'week') renderMulti('week', fullWeekOffsets());
-  }
-
-  document.querySelectorAll('.view-btn').forEach(btn => {
-    btn.addEventListener('click', () => setMode(btn.dataset.mode));
-  });
-
-  // ============================================================
-  // TAB SWITCHING
-  // ============================================================
-  document.querySelectorAll('.tab').forEach(t => {
-    t.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      document.body.dataset.tab = t.dataset.tab;
-      if (t.dataset.tab === 'chores') renderChores();
+  const DEV_KEY = 'theweek.frame.v1';
+  function applyFrameSize(w, h) {
+    document.documentElement.style.setProperty('--frame-w', `${w}px`);
+    document.documentElement.style.setProperty('--frame-h', `${h}px`);
+    document.getElementById('dev-w').value = w;
+    document.getElementById('dev-h').value = h;
+    document.getElementById('dev-w-val').textContent = w;
+    document.getElementById('dev-h-val').textContent = h;
+    localStorage.setItem(DEV_KEY, JSON.stringify({ w, h }));
+    // mark preset active if matches
+    document.querySelectorAll('.dev-preset').forEach(b => {
+      b.classList.toggle('active', +b.dataset.w === w && +b.dataset.h === h);
     });
+  }
+  // restore
+  try {
+    const saved = JSON.parse(localStorage.getItem(DEV_KEY));
+    if (saved && saved.w && saved.h) applyFrameSize(saved.w, saved.h);
+    else applyFrameSize(540, 960);
+  } catch { applyFrameSize(540, 960); }
+
+  document.getElementById('dev-w').addEventListener('input', e => {
+    applyFrameSize(+e.target.value, +document.getElementById('dev-h').value);
+  });
+  document.getElementById('dev-h').addEventListener('input', e => {
+    applyFrameSize(+document.getElementById('dev-w').value, +e.target.value);
+  });
+  document.querySelectorAll('.dev-preset').forEach(b => {
+    b.addEventListener('click', () => applyFrameSize(+b.dataset.w, +b.dataset.h));
   });
 
   // ============================================================
-  // INIT
+  // INIT + INTERVALS
   // ============================================================
-  updateClock();
-  setInterval(updateClock, 30000);
-  setMode('day');
-  // re-render day view to reposition now-line every minute
-  setInterval(() => {
-    if (document.body.dataset.mode === 'day') renderDay();
-  }, 60000);
+  function tick() {
+    updateTopDate();
+    if (viewMode === 'now') renderNow();
+    if (viewMode !== 'now') renderCalendar();
+  }
+  tick();
+  setInterval(tick, 30000);
 </script>
 </body>
 </html>
