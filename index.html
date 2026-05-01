@@ -351,6 +351,26 @@
   .dh.today .dh-dow { color: var(--accent); }
   .dh.today .dh-num { color: var(--accent); }
 
+  /* Single-day mode: Stendig hero header */
+  body[data-mode="day"] .dh {
+    padding: 10px 0 16px;
+    cursor: pointer;
+  }
+  body[data-mode="day"] .dh .dh-dow {
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    margin-bottom: 8px;
+  }
+  body[data-mode="day"] .dh .dh-num {
+    font-size: 72px;
+    letter-spacing: -0.05em;
+    line-height: 0.85;
+    font-weight: 600;
+  }
+  body[data-mode="day"] .ev { padding: 4px 7px; }
+  body[data-mode="day"] .ev .t { font-size: 11px; }
+  body[data-mode="day"] .ev .when { font-size: 9px; }
+
   .grid-body {
     display: grid;
     grid-template-columns: 26px 1fr;
@@ -520,6 +540,8 @@
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
   }
+  .chore-card-head .bal .earned { color: var(--ink); }
+  .chore-card-head .bal .of-total { color: var(--faint); font-weight: 500; font-size: 12px; }
   .chore-list { display: flex; flex-direction: column; }
   .chore-item {
     display: grid;
@@ -903,14 +925,18 @@
   // ============================================================
   let focusedPerson = null; // 'jordan', 'sarah', etc, or null
   let pinned = null;
-  let viewDayCount = 5; // 2/5/7
-  let viewMode = 'weekdays'; // weekend / weekdays / week / now
+  let viewMode = 'weekdays'; // weekend / weekdays / week / now / day
+  let viewDayOffset = 0;     // when in 'day' mode, which day
+  let prevNormalMode = 'weekdays'; // remembers last weekend/weekdays/week
 
   // ============================================================
   // DAY OFFSETS HELPERS
   // ============================================================
   function offsetsForMode(mode) {
     const today = realNow().getDay(); // 0=Sun..6=Sat
+    if (mode === 'day') {
+      return [viewDayOffset];
+    }
     if (mode === 'weekend') {
       let satOffset = (6 - today + 7) % 7;
       if (today === 0) satOffset = -1;
@@ -955,7 +981,14 @@
       const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
       const dnum = d.getDate();
       dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
-      dh.addEventListener('click', () => { /* future: zoom to single day */ });
+      dh.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (viewMode === 'day') {
+          setMode(prevNormalMode);
+        } else {
+          setMode('day', off);
+        }
+      });
       headers.appendChild(dh);
     });
 
@@ -1108,8 +1141,12 @@
   // ============================================================
   // VIEW MODE SWITCH
   // ============================================================
-  function setMode(mode) {
+  function setMode(mode, offset) {
+    if (['weekend','weekdays','week'].includes(viewMode)) {
+      prevNormalMode = viewMode;
+    }
     viewMode = mode;
+    if (typeof offset === 'number') viewDayOffset = offset;
     document.body.dataset.mode = mode;
     document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -1236,22 +1273,36 @@
   function saveChores(c) { localStorage.setItem(CHORES_KEY, JSON.stringify(c)); }
   let choreState = loadChores();
 
+  function calcTotals(items) {
+    const total = items.reduce((s, i) => s + (Number(i.price) || 0), 0);
+    const earned = items.filter(i => i.done).reduce((s, i) => s + (Number(i.price) || 0), 0);
+    return { total, earned };
+  }
+
+  function updateBalance(person) {
+    const items = choreState[person] || [];
+    const { total, earned } = calcTotals(items);
+    const balEl = document.querySelector(`.chore-card[data-person="${person}"] .bal`);
+    if (balEl) balEl.innerHTML = `<span class="earned">$${earned.toFixed(2)}</span><span class="of-total"> / $${total.toFixed(2)}</span>`;
+  }
+
   function renderChores() {
     const root = document.getElementById('chores-scroll');
     root.innerHTML = '';
     ['phoenix','lua'].forEach(person => {
       const card = document.createElement('div');
       card.className = 'chore-card';
+      card.dataset.person = person;
       const initial = person[0].toUpperCase();
       const name = person[0].toUpperCase() + person.slice(1);
       const items = choreState[person] || [];
-      const total = items.filter(i => i.done).reduce((s, i) => s + (Number(i.price) || 0), 0);
+      const { total, earned } = calcTotals(items);
       const isWhite = (person === 'lua');
       card.innerHTML = `
         <div class="chore-card-head">
           <div class="avatar" style="background: var(--${person}); ${isWhite?'color:white;':''}">${initial}</div>
           <div class="name">${name}</div>
-          <div class="bal">$${total.toFixed(2)}</div>
+          <div class="bal"><span class="earned">$${earned.toFixed(2)}</span><span class="of-total"> / $${total.toFixed(2)}</span></div>
         </div>
         <div class="chore-list"></div>
         <button class="chore-add">+ Add chore</button>
@@ -1274,9 +1325,16 @@
           choreState[person][idx].name = e.target.value;
           saveChores(choreState);
         });
-        row.querySelector('.chore-price').addEventListener('change', e => {
+        // live update on price as user types
+        const priceInput = row.querySelector('.chore-price');
+        priceInput.addEventListener('input', e => {
           choreState[person][idx].price = parseFloat(e.target.value) || 0;
-          saveChores(choreState); renderChores();
+          updateBalance(person);
+        });
+        priceInput.addEventListener('change', e => {
+          choreState[person][idx].price = parseFloat(e.target.value) || 0;
+          saveChores(choreState);
+          updateBalance(person);
         });
         row.querySelector('.chore-del').addEventListener('click', () => {
           choreState[person].splice(idx, 1);
