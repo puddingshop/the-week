@@ -2265,8 +2265,8 @@
     const m = +monthSlider.value;
     fakeMonth = m;
     monthVal.textContent = MONTH_NAMES[m];
-    if (viewMode !== 'now') setMode('now');
-    else renderNow();
+    updateNowBg();
+    if (viewMode === 'now') renderNow();
   });
 
   // DEV PANEL — day simulator
