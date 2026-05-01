@@ -968,12 +968,28 @@
     line-height: 1.15;
     margin-top: 10px;
   }
-  .ev-modal-when {
-    font-size: 13px;
-    font-variant-numeric: tabular-nums;
-    color: var(--mute);
-    margin-top: 3px;
+  .ev-modal-details {
+    margin-top: 12px;
     margin-bottom: 16px;
+  }
+  .ev-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-top: 1px solid var(--hair);
+  }
+  .ev-detail-row:last-child { border-bottom: 1px solid var(--hair); }
+  .ev-detail-label {
+    font-size: 13px;
+    color: var(--mute);
+    font-weight: 400;
+  }
+  .ev-detail-value {
+    font-size: 13px;
+    color: var(--ink);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
   .ev-note-read {
     font-size: 14px;
@@ -1188,7 +1204,16 @@
         <button class="modal-cancel" id="ev-modal-cancel">CLOSE</button>
       </div>
       <div class="ev-modal-title" id="ev-modal-title"></div>
-      <div class="ev-modal-when" id="ev-modal-when"></div>
+      <div class="ev-modal-details">
+        <div class="ev-detail-row">
+          <span class="ev-detail-label">Time</span>
+          <span class="ev-detail-value" id="ev-modal-time"></span>
+        </div>
+        <div class="ev-detail-row" id="ev-modal-location-row" style="display:none;">
+          <span class="ev-detail-label">Location</span>
+          <span class="ev-detail-value" id="ev-modal-location"></span>
+        </div>
+      </div>
       <!-- read mode -->
       <div class="ev-note-read" id="ev-note-read">
         <span id="ev-note-read-text"></span>
@@ -1673,7 +1698,7 @@
     document.getElementById('ev-modal-dot').style.background = `var(--${ev.p})`;
     document.getElementById('ev-modal-who').textContent = `${personLabel}`;
     document.getElementById('ev-modal-title').textContent = ev.t;
-    document.getElementById('ev-modal-when').textContent = `${dateLabel} · ${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+    document.getElementById('ev-modal-time').textContent = `${dateLabel}, ${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
     evModalShowRead();
     document.getElementById('ev-modal').classList.add('shown');
   }
