@@ -429,8 +429,8 @@
     background: white;
     border: 1.25px solid;
     color: var(--ink);
-    filter: saturate(0.45);
-    opacity: 0.72;
+    filter: saturate(0);
+    opacity: 0.5;
   }
   .ev .t { font-weight: 600; font-size: 9px; letter-spacing: -0.01em; }
   .ev .when { font-size: 8px; color: var(--mute); margin-top: 1px; font-variant-numeric: tabular-nums; }
@@ -456,7 +456,21 @@
   /* state: past = ghosted */
   .ev.past {
     opacity: 0.15;
+    filter: saturate(0);
+  }
+
+  /* day-focus: tap a day header to reveal its colours */
+  body[data-day-focus]:not([data-focus]) .col.focused-day .ev {
+    filter: saturate(0.45);
+    opacity: 0.72;
+  }
+  body[data-day-focus]:not([data-focus]) .col.focused-day .ev.next {
+    filter: none;
+    opacity: 1;
+  }
+  body[data-day-focus]:not([data-focus]) .col.focused-day .ev.past {
     filter: saturate(0.25);
+    opacity: 0.15;
   }
 
   /* in-focus events go full saturation when an avatar is tapped */
@@ -912,6 +926,77 @@
   }
   .placeholder .sub { font-size: 12px; color: var(--faint); }
 
+  /* ============ MONTH VIEW ============ */
+  .mon-grid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 14px 8px;
+    min-height: 0;
+  }
+  .mon-dows {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--hair);
+  }
+  .mon-dow {
+    text-align: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: var(--mute);
+    text-transform: uppercase;
+    padding: 5px 0 8px;
+  }
+  .mon-weeks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .mon-week {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid var(--hair);
+    min-height: 0;
+  }
+  .mon-week:last-child { border-bottom: none; }
+  .mon-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--hair);
+    gap: 5px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .mon-cell:last-child { border-right: none; }
+  .mon-cell:hover { background: rgba(0,0,0,0.018); }
+  .mon-cell.today { background: rgba(255,94,31,0.03); }
+  .mon-num {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .mon-cell.out-of-month .mon-num { color: var(--faint); }
+  .mon-cell.today .mon-num { color: var(--accent); }
+  .mon-dots {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+  }
+  .mon-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--faint);
+  }
+
   /* ============ NOW VIEW visibility ============ */
   body[data-mode="now"] .topbar,
   body[data-mode="now"] .people { display: none; }
@@ -1029,6 +1114,9 @@
         <button class="seg-btn" data-mode="week" title="Full week">
           <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="5.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="8.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="11.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="14.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="17.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="20.5" y="6" width="2.1" height="12" rx="0.5"/></svg>
         </button>
+        <button class="seg-btn" data-mode="month" title="Month">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="4" height="4" rx="0.6"/><rect x="10" y="3" width="4" height="4" rx="0.6"/><rect x="17" y="3" width="4" height="4" rx="0.6"/><rect x="3" y="10" width="4" height="4" rx="0.6"/><rect x="10" y="10" width="4" height="4" rx="0.6"/><rect x="17" y="10" width="4" height="4" rx="0.6"/><rect x="3" y="17" width="4" height="4" rx="0.6"/><rect x="10" y="17" width="4" height="4" rx="0.6"/><rect x="17" y="17" width="4" height="4" rx="0.6"/></svg>
+        </button>
       </div>
     </div>
 
@@ -1061,6 +1149,22 @@
             <div class="hours" id="hours"></div>
             <div class="columns" id="columns"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- MONTH (Stendig-spirit grid) -->
+      <div class="view" id="view-month">
+        <div class="mon-grid">
+          <div class="mon-dows">
+            <div class="mon-dow">M</div>
+            <div class="mon-dow">T</div>
+            <div class="mon-dow">W</div>
+            <div class="mon-dow">T</div>
+            <div class="mon-dow">F</div>
+            <div class="mon-dow">S</div>
+            <div class="mon-dow">S</div>
+          </div>
+          <div class="mon-weeks" id="mon-weeks"></div>
         </div>
       </div>
 
@@ -1155,33 +1259,80 @@
   // ============================================================
   // dayOffset: 0 = today, +1 = tomorrow, etc.
   const events = [
-    // today
-    { p: 'sarah',   t: 'Yoga',         start: '07:00', end: '08:00', d: 0 },
-    { p: 'jordan',  t: 'Standup',      start: '09:00', end: '09:30', d: 0 },
-    { p: 'phoenix', t: 'School',       start: '09:00', end: '15:00', d: 0 },
-    { p: 'lua',     t: 'School',       start: '09:00', end: '15:00', d: 0 },
-    { p: 'jordan',  t: 'Design rev',   start: '10:30', end: '11:30', d: 0 },
-    { p: 'sarah',   t: 'Client call',  start: '11:00', end: '12:00', d: 0 },
-    { p: 'jordan',  t: 'Lunch',        start: '12:30', end: '13:30', d: 0 },
-    { p: 'sarah',   t: 'Pilates',      start: '14:00', end: '15:00', d: 0 },
-    { p: 'phoenix', t: 'Soccer',       start: '16:00', end: '17:00', d: 0 },
-    { p: 'lua',     t: 'Piano',        start: '16:30', end: '17:15', d: 0 },
-    { p: 'jordan',  t: 'Family dinner',start: '18:00', end: '19:00', d: 0 },
-    // tomorrow
-    { p: 'phoenix', t: 'Birthday party', start: '14:00', end: '17:00', d: 1 },
+    // monday (d=-4)
+    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: -4 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -4 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -4 },
+    { p: 'jordan',  t: 'Team meeting',  start: '09:30', end: '10:30', d: -4 },
+    { p: 'sarah',   t: 'Client work',   start: '10:00', end: '12:30', d: -4 },
+    { p: 'jordan',  t: 'Deep work',     start: '11:00', end: '13:00', d: -4 },
+    { p: 'lua',     t: 'Dance',         start: '15:30', end: '16:30', d: -4 },
+    { p: 'phoenix', t: 'Soccer',        start: '16:00', end: '17:30', d: -4 },
+    { p: 'sarah',   t: 'Grocery run',   start: '16:00', end: '17:00', d: -4 },
+    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: -4 },
+    // tuesday (d=-3)
+    { p: 'sarah',   t: 'PT session',    start: '07:30', end: '08:30', d: -3 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -3 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -3 },
+    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: -3 },
+    { p: 'jordan',  t: 'Design review', start: '10:00', end: '11:30', d: -3 },
+    { p: 'sarah',   t: 'Dentist',       start: '11:00', end: '12:00', d: -3 },
+    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: -3 },
+    { p: 'lua',     t: 'Art class',     start: '15:30', end: '16:30', d: -3 },
+    { p: 'phoenix', t: 'Tutor',         start: '15:30', end: '17:00', d: -3 },
+    { p: 'sarah',   t: 'Book club',     start: '19:00', end: '21:00', d: -3 },
+    // wednesday (d=-2)
+    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: -2 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -2 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -2 },
+    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: -2 },
+    { p: 'jordan',  t: 'Sprint review', start: '10:00', end: '11:00', d: -2 },
+    { p: 'sarah',   t: 'Lunch w/ Mum',  start: '12:00', end: '13:30', d: -2 },
+    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: -2 },
+    { p: 'phoenix', t: 'Art class',     start: '15:30', end: '17:00', d: -2 },
+    { p: 'lua',     t: 'Story time',    start: '17:00', end: '18:00', d: -2 },
+    { p: 'jordan',  t: 'Gym',           start: '17:30', end: '18:30', d: -2 },
+    // thursday (d=-1)
+    { p: 'sarah',   t: 'PT session',    start: '08:00', end: '09:00', d: -1 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -1 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -1 },
+    { p: 'jordan',  t: 'Deep work',     start: '09:00', end: '12:00', d: -1 },
+    { p: 'sarah',   t: 'Client call',   start: '10:00', end: '11:00', d: -1 },
+    { p: 'jordan',  t: 'Product review',start: '14:00', end: '15:00', d: -1 },
+    { p: 'lua',     t: 'Swimming',      start: '16:00', end: '17:00', d: -1 },
+    { p: 'phoenix', t: 'Scouts',        start: '17:00', end: '18:30', d: -1 },
+    { p: 'sarah',   t: 'Date night',    start: '19:30', end: '22:00', d: -1 },
+    { p: 'jordan',  t: 'Date night',    start: '19:30', end: '22:00', d: -1 },
+    // friday — today (d=0)
+    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: 0 },
+    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: 0 },
+    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 0 },
+    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 0 },
+    { p: 'jordan',  t: 'Design rev',    start: '10:30', end: '11:30', d: 0 },
+    { p: 'sarah',   t: 'Client call',   start: '11:00', end: '12:00', d: 0 },
+    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: 0 },
+    { p: 'sarah',   t: 'Pilates',       start: '14:00', end: '15:00', d: 0 },
+    { p: 'phoenix', t: 'Soccer',        start: '16:00', end: '17:00', d: 0 },
+    { p: 'lua',     t: 'Piano',         start: '16:30', end: '17:15', d: 0 },
+    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: 0 },
+    // saturday (d=1)
     { p: 'jordan',  t: 'Run',           start: '07:30', end: '08:30', d: 1 },
     { p: 'sarah',   t: 'Brunch',        start: '10:00', end: '12:00', d: 1 },
-    // sunday
-    { p: 'lua',     t: 'Swim lesson',   start: '09:00', end: '10:00', d: 2 },
+    { p: 'lua',     t: 'Park',          start: '10:00', end: '12:00', d: 1 },
+    { p: 'phoenix', t: 'Soccer game',   start: '10:30', end: '12:00', d: 1 },
+    { p: 'jordan',  t: 'Groceries',     start: '12:30', end: '13:30', d: 1 },
+    { p: 'phoenix', t: 'Birthday party',start: '14:00', end: '17:00', d: 1 },
+    { p: 'sarah',   t: 'Gym',           start: '14:30', end: '15:30', d: 1 },
+    { p: 'jordan',  t: 'Family BBQ',    start: '17:30', end: '20:00', d: 1 },
+    { p: 'sarah',   t: 'Family BBQ',    start: '17:30', end: '20:00', d: 1 },
+    // sunday (d=2)
     { p: 'sarah',   t: 'Hike',          start: '08:00', end: '11:00', d: 2 },
-    // mon
-    { p: 'jordan',  t: 'Workshop',      start: '10:00', end: '12:00', d: 3 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 3 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 3 },
-    // tues
-    { p: 'sarah',   t: 'Dentist',       start: '11:00', end: '12:00', d: 4 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 4 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 4 },
+    { p: 'lua',     t: 'Swim lesson',   start: '09:00', end: '10:00', d: 2 },
+    { p: 'jordan',  t: 'Coffee',        start: '09:30', end: '10:30', d: 2 },
+    { p: 'phoenix', t: 'Family walk',   start: '15:00', end: '16:30', d: 2 },
+    { p: 'jordan',  t: 'Meal prep',     start: '16:00', end: '17:30', d: 2 },
+    { p: 'lua',     t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
+    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
   ];
 
   const START_HOUR = 6;
@@ -1209,7 +1360,8 @@
   // ============================================================
   // STATE
   // ============================================================
-  let focusedPerson = null; // 'jordan', 'sarah', etc, or null
+  let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
+  let focusedDayOffset = null; // which day column is colour-revealed, or null
   let pinned = null;
   let viewMode = 'weekdays'; // weekend / weekdays / week / now / day
   let viewDayOffset = 0;     // when in 'day' mode, which day
@@ -1269,11 +1421,7 @@
       dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
       dh.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (viewMode === 'day') {
-          setMode(prevNormalMode);
-        } else {
-          setMode('day', off);
-        }
+        setDayFocus(off);
       });
       headers.appendChild(dh);
     });
@@ -1308,7 +1456,7 @@
     offsets.forEach(off => {
       const isToday = off === 0;
       const col = document.createElement('div');
-      col.className = 'col' + (isToday ? ' today' : '');
+      col.className = 'col' + (isToday ? ' today' : '') + (focusedDayOffset === off ? ' focused-day' : '');
       for (let h = START_HOUR; h < END_HOUR; h++) {
         const cell = document.createElement('div');
         cell.className = 'hour-cell';
@@ -1417,6 +1565,13 @@
     renderCalendar();
   }
 
+  function setDayFocus(offset) {
+    focusedDayOffset = (focusedDayOffset === offset) ? null : offset;
+    if (focusedDayOffset !== null) document.body.dataset.dayFocus = '1';
+    else delete document.body.dataset.dayFocus;
+    renderCalendar();
+  }
+
   document.querySelectorAll('.person').forEach(p => {
     p.addEventListener('click', () => {
       const name = p.dataset.p;
@@ -1428,6 +1583,11 @@
   document.getElementById('view-cal').addEventListener('click', (e) => {
     if (e.target.classList.contains('cal') || e.target.classList.contains('grid-body') || e.target.classList.contains('columns') || e.target.classList.contains('col') || e.target.classList.contains('hour-cell')) {
       if (focusedPerson) setFocus(null);
+      if (focusedDayOffset !== null) {
+        focusedDayOffset = null;
+        delete document.body.dataset.dayFocus;
+        renderCalendar();
+      }
     }
   });
 
@@ -1453,7 +1613,7 @@
   // ============================================================
   function setMode(mode, offset) {
     const swap = () => {
-      if (['weekend','weekdays','week'].includes(viewMode)) {
+      if (['weekend','weekdays','week','month'].includes(viewMode)) {
         prevNormalMode = viewMode;
       }
       viewMode = mode;
@@ -1464,6 +1624,9 @@
       if (mode === 'now') {
         document.getElementById('view-now').classList.add('active');
         renderNow();
+      } else if (mode === 'month') {
+        document.getElementById('view-month').classList.add('active');
+        renderMonth();
       } else {
         document.getElementById('view-cal').classList.add('active');
         renderCalendar();
@@ -1955,12 +2118,72 @@
   });
 
   // ============================================================
+  // MONTH VIEW
+  // ============================================================
+  function renderMonth() {
+    const now = realNow();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay  = new Date(year, month + 1, 0);
+    const firstDow = firstDay.getDay(); // 0=Sun
+    const daysBack = firstDow === 0 ? 6 : firstDow - 1;
+    const gridStart = new Date(firstDay);
+    gridStart.setDate(gridStart.getDate() - daysBack);
+    const totalCells = daysBack + lastDay.getDate() + (lastDay.getDay() === 0 ? 0 : 7 - lastDay.getDay());
+    const weeks = Math.ceil(totalCells / 7);
+
+    const todayMidnight = new Date(now);
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    const root = document.getElementById('mon-weeks');
+    root.innerHTML = '';
+
+    for (let w = 0; w < weeks; w++) {
+      const weekEl = document.createElement('div');
+      weekEl.className = 'mon-week';
+      for (let d = 0; d < 7; d++) {
+        const cellDate = new Date(gridStart);
+        cellDate.setDate(gridStart.getDate() + w * 7 + d);
+        const isThisMonth = cellDate.getMonth() === month;
+        const diff = Math.round((cellDate - todayMidnight) / 86400000);
+        const isToday = diff === 0;
+
+        const cell = document.createElement('div');
+        cell.className = 'mon-cell' + (!isThisMonth ? ' out-of-month' : '') + (isToday ? ' today' : '');
+
+        const numEl = document.createElement('div');
+        numEl.className = 'mon-num';
+        numEl.textContent = cellDate.getDate();
+        cell.appendChild(numEl);
+
+        const dayEvents = events.filter(e => e.d === diff);
+        if (dayEvents.length > 0) {
+          const dotsEl = document.createElement('div');
+          dotsEl.className = 'mon-dots';
+          [...new Set(dayEvents.map(e => e.p))].forEach(() => {
+            const dot = document.createElement('div');
+            dot.className = 'mon-dot';
+            dotsEl.appendChild(dot);
+          });
+          cell.appendChild(dotsEl);
+        }
+
+        cell.addEventListener('click', () => setMode('weekdays'));
+        weekEl.appendChild(cell);
+      }
+      root.appendChild(weekEl);
+    }
+  }
+
+  // ============================================================
   // INIT + INTERVALS
   // ============================================================
   function tick() {
     updateTopDate();
     if (viewMode === 'now') renderNow();
-    if (viewMode !== 'now') renderCalendar();
+    else if (viewMode === 'month') renderMonth();
+    else renderCalendar();
   }
   tick();
   setInterval(tick, 30000);
