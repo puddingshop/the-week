@@ -1258,6 +1258,11 @@
     <button class="dev-pal" data-pal="muted">Purple</button>
     <button class="dev-pal" data-pal="earth">Earth</button>
   </div>
+  <div class="dev-title">NOW MONTH</div>
+  <div class="dev-row">
+    <input type="range" id="dev-month" min="0" max="11" step="1" value="4">
+    <span class="dev-val" id="dev-month-val">May</span>
+  </div>
   <div class="dev-title">FRAME</div>
   <div class="dev-row">
     <label>Width</label>
@@ -1763,12 +1768,12 @@
   }
 
   function updateNowBg() {
-    const month = realNow().getMonth(); // 0=Jan..11=Dec
+    const month = fakeMonth !== null ? fakeMonth : realNow().getMonth();
     const persons = ['jordan','sarah','phoenix','lua'];
-    const key = persons[Math.floor(month / 3) % 4]; // season-based: Q1=jordan, Q2=sarah, Q3=phoenix, Q4=lua
-    const style = getComputedStyle(document.documentElement);
-    const bg   = style.getPropertyValue(`--${key}`).trim();
-    const text = style.getPropertyValue(`--${key}-text`).trim() || 'white';
+    const personKey = persons[Math.floor(month / 3) % 4];
+    const p = PALETTES[activePalette];
+    const bg   = p[personKey];
+    const text = p[personKey + 'Text'] || 'white';
     const r = document.documentElement;
     r.style.setProperty('--now-bg',   bg);
     r.style.setProperty('--now-text', text);
@@ -2194,6 +2199,9 @@
   // ============================================================
   // DEV PANEL — palette switcher
   // ============================================================
+  let activePalette = 'bright';
+  let fakeMonth = null; // null = use real month; 0-11 = override
+
   const PALETTES = {
     bright: {
       jordan: '#E9C73A', jordanText: '#1a1a1a',
@@ -2215,6 +2223,7 @@
     },
   };
   function applyPalette(key) {
+    activePalette = key;
     const p = PALETTES[key];
     const r = document.documentElement;
     r.style.setProperty('--jordan',       p.jordan);
@@ -2233,6 +2242,21 @@
   document.querySelectorAll('.dev-pal').forEach(b =>
     b.addEventListener('click', () => applyPalette(b.dataset.pal))
   );
+
+  // DEV PANEL — month simulator (Now screen colour)
+  // ============================================================
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthSlider = document.getElementById('dev-month');
+  const monthVal    = document.getElementById('dev-month-val');
+  monthSlider.value = realNow().getMonth();
+  monthVal.textContent = MONTH_NAMES[realNow().getMonth()];
+  monthSlider.addEventListener('input', () => {
+    const m = +monthSlider.value;
+    fakeMonth = m;
+    monthVal.textContent = MONTH_NAMES[m];
+    updateNowBg();
+    if (viewMode === 'now') renderNow();
+  });
 
   // DEV PANEL — day simulator
   // ============================================================
