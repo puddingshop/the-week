@@ -1449,6 +1449,7 @@
   // RENDER CALENDAR
   // ============================================================
   function renderCalendar() {
+    try {
     const offsets = offsetsForMode(viewMode);
     const headers = document.getElementById('day-headers');
     const hoursCol = document.getElementById('hours');
@@ -1614,6 +1615,9 @@
         line.style.right = `calc(${(offsets.length - todayIndex - 1) * colWidth}% + 0px)`;
         cols.appendChild(line);
       }
+    }
+    } catch (e) {
+      console.error('renderCalendar error:', e);
     }
   }
 
