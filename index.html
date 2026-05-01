@@ -192,39 +192,22 @@
   }
   .view.active { display: flex; }
 
-  /* ============ NOW VIEW (Karlsson flip-clock energy) ============ */
+  /* ============ NOW VIEW ============ */
   #view-now {
     background: var(--bg);
     padding: 0;
     flex-direction: column;
     position: relative;
-  }
-  .now-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    z-index: 10;
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    line-height: 1;
     cursor: pointer;
-    color: var(--mute);
-    padding: 6px 10px;
-    border-radius: 6px;
-    letter-spacing: 0.15em;
-    font-weight: 500;
-    font-family: inherit;
   }
-  .now-close:hover { color: var(--ink); background: var(--hair); }
 
   .nt-year-band {
     text-align: center;
-    font-size: 11px;
-    letter-spacing: 0.4em;
-    color: var(--mute);
-    font-weight: 600;
-    padding: 18px 0 14px;
+    font-size: 8px;
+    letter-spacing: 0.55em;
+    color: var(--faint);
+    font-weight: 700;
+    padding: 13px 0 11px;
     border-bottom: 1px solid var(--hair);
     font-variant-numeric: tabular-nums;
   }
@@ -232,45 +215,53 @@
   .nt-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1.4fr;
+    grid-template-columns: 1fr 1.5fr;
     grid-template-rows: 1fr 1fr;
     min-height: 0;
   }
   .nt-cell {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 14px;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 14px 18px 18px;
     overflow: hidden;
+    position: relative;
   }
-  .nt-cell.month-cell {
-    border-right: 1px solid var(--hair);
-    border-bottom: 1px solid var(--hair);
-  }
-  .nt-cell.day-cell {
-    border-bottom: 1px solid var(--hair);
-  }
-  .nt-cell.time-cell {
-    border-right: 1px solid var(--hair);
+  .nt-cell.month-cell { border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+  .nt-cell.day-cell   { border-bottom: 1px solid var(--hair); }
+  .nt-cell.time-cell  { border-right: 1px solid var(--hair); }
+
+  .nt-label {
+    position: absolute;
+    top: 13px;
+    left: 18px;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--faint);
   }
   .nt-month {
-    font-size: 38px;
-    font-weight: 600;
+    font-size: 56px;
+    font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1;
     color: var(--ink);
+    text-transform: uppercase;
   }
   .nt-day {
-    font-size: 150px;
-    font-weight: 600;
-    letter-spacing: -0.08em;
-    line-height: 0.85;
+    font-size: clamp(120px, 22vw, 190px);
+    font-weight: 700;
+    letter-spacing: -0.07em;
+    line-height: 0.82;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
+    margin-left: -0.03em;
   }
   .nt-time {
-    font-size: 36px;
-    font-weight: 300;
+    font-size: 68px;
+    font-weight: 200;
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
     color: var(--ink);
@@ -278,19 +269,21 @@
     white-space: nowrap;
   }
   .nt-time .ampm {
-    font-size: 11px;
+    font-size: 10px;
     color: var(--mute);
-    margin-left: 4px;
-    letter-spacing: 0.15em;
+    margin-left: 5px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    font-weight: 600;
-    vertical-align: 0.4em;
+    font-weight: 700;
+    vertical-align: 0.55em;
   }
   .nt-dow {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--accent);
+    line-height: 1;
   }
 
   /* ============ CALENDAR GRID ============ */
@@ -1129,13 +1122,24 @@
 
       <!-- NOW (standby / home) -->
       <div class="view" id="view-now">
-        <button class="now-close" id="now-close">×</button>
         <div class="nt-year-band" id="nt-year">2026</div>
         <div class="nt-grid">
-          <div class="nt-cell month-cell"><span class="nt-month" id="nt-month">MAY</span></div>
-          <div class="nt-cell day-cell"><span class="nt-day" id="nt-day">01</span></div>
-          <div class="nt-cell time-cell"><span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span></div>
-          <div class="nt-cell dow-cell"><span class="nt-dow" id="nt-dow-big">FRI</span></div>
+          <div class="nt-cell month-cell">
+            <span class="nt-label">Month</span>
+            <span class="nt-month" id="nt-month">MAY</span>
+          </div>
+          <div class="nt-cell day-cell">
+            <span class="nt-label">Day</span>
+            <span class="nt-day" id="nt-day">02</span>
+          </div>
+          <div class="nt-cell time-cell">
+            <span class="nt-label">Time</span>
+            <span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span>
+          </div>
+          <div class="nt-cell dow-cell">
+            <span class="nt-label">Weekday</span>
+            <span class="nt-dow" id="nt-dow-big">FRIDAY</span>
+          </div>
         </div>
       </div>
 
@@ -1680,7 +1684,7 @@
 
   // tap top date → NOW
   document.getElementById('topdate').addEventListener('click', () => setMode('now'));
-  document.getElementById('now-close').addEventListener('click', () => setMode('weekdays'));
+  document.getElementById('view-now').addEventListener('click', () => setMode(prevNormalMode));
 
   // ============================================================
   // NOW VIEW
@@ -1717,7 +1721,7 @@
     document.getElementById('nt-month').textContent = now.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
     document.getElementById('nt-day').textContent = pad2(now.getDate());
     document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
-    document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
   }
 
   // ============================================================
