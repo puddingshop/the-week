@@ -209,14 +209,7 @@
     cursor: pointer;
   }
   .nt-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--mute);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    display: none;
   }
   .nt-time-wrap {
     flex: 1;
@@ -242,16 +235,28 @@
   .nt-bottom {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 6px;
   }
   .nt-weekday {
-    font-size: 18px;
+    font-size: 54px;
     font-weight: 700;
     color: var(--ink);
     line-height: 1;
   }
   .nt-date {
-    font-size: 18px;
+    font-size: 54px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .nt-time-stacked {
+    font-size: 54px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .nt-year-bottom {
+    font-size: 54px;
     font-weight: 700;
     color: var(--ink);
     line-height: 1;
@@ -1132,16 +1137,14 @@
 
       <!-- NOW (standby / home) -->
       <div class="view" id="view-now">
-        <div class="nt-meta">
-          <span id="nt-dow-big">FRIDAY</span>
-          <span id="nt-year">2026</span>
-        </div>
         <div class="nt-time-wrap">
           <span class="nt-time" id="nt-time-big">11:15<span class="ampm">am</span></span>
         </div>
         <div class="nt-bottom">
           <div class="nt-weekday" id="nt-weekday">Wednesday</div>
           <div class="nt-date" id="nt-date">2 May</div>
+          <div class="nt-time-stacked" id="nt-time-stacked">11:15 am</div>
+          <div class="nt-year-bottom" id="nt-year-bottom">2026</div>
         </div>
       </div>
 
@@ -1819,11 +1822,11 @@
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
     const month = now.toLocaleDateString('en-US', { month: 'long' });
-    document.getElementById('nt-year').textContent = now.getFullYear();
-    document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
     document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('nt-weekday').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
     document.getElementById('nt-date').textContent = `${month} ${now.getDate()}`;
+    document.getElementById('nt-time-stacked').textContent = `${h12}:${pad2(m)} ${ampm}`;
+    document.getElementById('nt-year-bottom').textContent = now.getFullYear();
   }
 
   // ============================================================
