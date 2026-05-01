@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Week</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #8a8a8a;
+    --border: #e8e8e8;
+    --accent: #2bb5e8;
+
+    /* Person colors — Skylight-inspired */
+    --jordan: #F5D547;       /* yellow */
+    --jordan-text: #6B5A0F;
+    --sarah: #F08A9E;        /* pink */
+    --sarah-text: #7A2E3F;
+    --phoenix: #A4D65E;      /* green */
+    --phoenix-text: #3F5C1A;
+    --lua: #C4A8E8;          /* purple */
+    --lua-text: #4A3873;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    color: var(--text);
+    background: #d8d8d6;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+  }
+
+  .frame {
+    background: var(--bg);
+    width: min(540px, calc(100vh * 9 / 16));
+    aspect-ratio: 9 / 16;
+    height: auto;
+    max-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 12px #f4f1ec,
+      0 0 0 14px #c9bfae,
+      0 24px 60px rgba(0,0,0,0.18),
+      0 8px 16px rgba(0,0,0,0.08);
+    position: relative;
+  }
+
+  /* ---------- Top status bar ---------- */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 32px 0;
+  }
+
+  .weather {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  .weather .icon { font-size: 24px; margin-top: 4px; }
+  .weather .hilo {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.1;
+    margin-top: 4px;
+  }
+
+  .clock {
+    font-size: 38px;
+    font-weight: 500;
+    letter-spacing: -1px;
+  }
+
+  .family-name {
+    position: absolute;
+    top: 28px;
+    right: 32px;
+    font-size: 13px;
+    color: var(--text-muted);
+    transform: translateY(-22px);
+  }
+
+  /* ---------- Date / view toggle ---------- */
+  .date-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 18px 32px 12px;
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+  .view-toggle .active { color: var(--text); font-weight: 600; }
+
+  .current-date {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .right-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  /* ---------- People row ---------- */
+  .people {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    padding: 16px 32px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .person {
+    text-align: center;
+    flex: 0 0 auto;
+  }
+
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #ddd;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    font-weight: 600;
+    border: 3px solid var(--avatar-color, #ccc);
+  }
+
+  .person-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .person-tasks {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .person[data-color="jordan"] { --avatar-color: var(--jordan); }
+  .person[data-color="jordan"] .avatar { background: var(--jordan); color: var(--jordan-text); }
+  .person[data-color="sarah"] { --avatar-color: var(--sarah); }
+  .person[data-color="sarah"] .avatar { background: var(--sarah); color: var(--sarah-text); }
+  .person[data-color="phoenix"] { --avatar-color: var(--phoenix); }
+  .person[data-color="phoenix"] .avatar { background: var(--phoenix); color: var(--phoenix-text); }
+  .person[data-color="lua"] { --avatar-color: var(--lua); }
+  .person[data-color="lua"] .avatar { background: var(--lua); color: var(--lua-text); }
+
+  /* ---------- Timeline ---------- */
+  .timeline-wrap {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 12px 32px 80px 56px;
+  }
+
+  .hour-row {
+    position: relative;
+    height: 60px;
+    border-top: 1px solid #f2f2f2;
+  }
+  .hour-row:first-child { border-top: none; }
+
+  .hour-label {
+    position: absolute;
+    left: -50px;
+    top: -8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    width: 44px;
+    text-align: right;
+  }
+
+  .events-layer {
+    position: absolute;
+    inset: 12px 32px 80px 56px;
+    pointer-events: none;
+  }
+
+  .event {
+    position: absolute;
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 11px;
+    line-height: 1.25;
+    overflow: hidden;
+    border-left: 3px solid rgba(0,0,0,0.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .event .title { font-weight: 600; }
+  .event .time { font-size: 10px; opacity: 0.8; }
+
+  .event.jordan { background: var(--jordan); color: var(--jordan-text); }
+  .event.sarah { background: var(--sarah); color: var(--sarah-text); }
+  .event.phoenix { background: var(--phoenix); color: var(--phoenix-text); }
+  .event.lua { background: var(--lua); color: var(--lua-text); }
+
+  /* current time indicator */
+  .now-line {
+    position: absolute;
+    left: -8px;
+    right: 0;
+    height: 1px;
+    background: #1a1a1a;
+    z-index: 10;
+  }
+  .now-line::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #1a1a1a;
+  }
+
+  /* ---------- Bottom tab bar ---------- */
+  .tabs {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 14px 32px 22px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tab .icon { font-size: 18px; }
+  .tab.active { color: var(--accent); }
+
+  /* floating add */
+  .fab {
+    position: fixed;
+    bottom: 92px;
+    right: 28px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+  }
+
+  .placeholder-tab {
+    flex: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 32px;
+  }
+  .placeholder-tab .big { font-size: 48px; }
+  .placeholder-tab .label { font-size: 15px; max-width: 280px; line-height: 1.5; }
+
+  body[data-tab="helper"] .timeline-wrap,
+  body[data-tab="todos"] .timeline-wrap,
+  body[data-tab="routines"] .timeline-wrap { display: none; }
+  body[data-tab="helper"] .placeholder-tab[data-for="helper"],
+  body[data-tab="todos"] .placeholder-tab[data-for="todos"],
+  body[data-tab="routines"] .placeholder-tab[data-for="routines"] { display: flex; }
+
+</style>
+</head>
+<body data-tab="calendar">
+
+<div class="frame">
+
+  <div style="position:relative;">
+    <div class="family-name">Hillier Family · Wi-Fi</div>
+  </div>
+
+  <div class="topbar">
+    <div class="weather">
+      <span class="icon">☀️</span>
+      <span>22°</span>
+      <div class="hilo">25°<br>14°</div>
+    </div>
+    <div class="clock" id="clock">9:20am</div>
+  </div>
+
+  <div class="date-row">
+    <div class="view-toggle">
+      <span class="active">D</span>
+      <span>W</span>
+      <span>M</span>
+    </div>
+    <div class="current-date" id="date">Friday, May 1</div>
+    <div class="right-controls">
+      <span>⊞</span>
+      <span>▾</span>
+    </div>
+  </div>
+
+  <div class="people">
+    <div class="person" data-color="jordan">
+      <div class="avatar">J</div>
+      <div class="person-name">Jordan</div>
+      <div class="person-tasks">3 to-do</div>
+    </div>
+    <div class="person" data-color="sarah">
+      <div class="avatar">S</div>
+      <div class="person-name">Sarah</div>
+      <div class="person-tasks">2 to-do</div>
+    </div>
+    <div class="person" data-color="phoenix">
+      <div class="avatar">P</div>
+      <div class="person-name">Phoenix</div>
+      <div class="person-tasks">1 to-do</div>
+    </div>
+    <div class="person" data-color="lua">
+      <div class="avatar">L</div>
+      <div class="person-name">Lua</div>
+      <div class="person-tasks">1 to-do</div>
+    </div>
+  </div>
+
+  <div class="timeline-wrap">
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <!-- Placeholder tabs -->
+  <div class="placeholder-tab" data-for="helper">
+    <div class="big">🪄</div>
+    <div class="label"><strong>Helper</strong><br>Coming soon — AI assistant for the family.</div>
+  </div>
+  <div class="placeholder-tab" data-for="todos">
+    <div class="big">✅</div>
+    <div class="label"><strong>To-dos</strong><br>Shared lists for the household.</div>
+  </div>
+  <div class="placeholder-tab" data-for="routines">
+    <div class="big">🔁</div>
+    <div class="label"><strong>Routines</strong><br>Morning, bedtime, weekly chores.</div>
+  </div>
+
+  <div class="fab">+</div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="calendar"><span class="icon">📅</span><span>Calendar</span></div>
+    <div class="tab" data-tab="helper"><span class="icon">🪄</span><span>Helper</span></div>
+    <div class="tab" data-tab="todos"><span class="icon">✓</span><span>To-dos</span></div>
+    <div class="tab" data-tab="routines"><span class="icon">≡</span><span>Routines</span></div>
+  </div>
+
+</div>
+
+<script>
+  // --- Sample events (replace with iCloud .ics feed later) ---
+  const events = [
+    { person: 'sarah',   title: 'Yoga',           start: '07:00', end: '08:00' },
+    { person: 'jordan',  title: 'Standup',        start: '09:00', end: '09:30' },
+    { person: 'phoenix', title: 'School',         start: '09:00', end: '15:00' },
+    { person: 'lua',     title: 'School',         start: '09:00', end: '15:00' },
+    { person: 'jordan',  title: 'Design review',  start: '10:30', end: '11:30' },
+    { person: 'sarah',   title: 'Client call',    start: '11:00', end: '12:00' },
+    { person: 'jordan',  title: 'Lunch w/ Dan',   start: '12:30', end: '13:30' },
+    { person: 'sarah',   title: 'Pilates',        start: '14:00', end: '15:00' },
+    { person: 'phoenix', title: 'Soccer',         start: '16:00', end: '17:00' },
+    { person: 'lua',     title: 'Piano',          start: '16:30', end: '17:15' },
+    { person: 'jordan',  title: 'Family dinner',  start: '18:00', end: '19:00' },
+    { person: 'sarah',   title: 'Family dinner',  start: '18:00', end: '19:00' },
+    { person: 'phoenix', title: 'Family dinner',  start: '18:00', end: '19:00' },
+    { person: 'lua',     title: 'Family dinner',  start: '18:00', end: '19:00' },
+  ];
+
+  // --- Build hour grid (6am to 10pm) ---
+  const startHour = 6;
+  const endHour = 22;
+  const pxPerHour = 60;
+
+  const tl = document.getElementById('timeline');
+  for (let h = startHour; h <= endHour; h++) {
+    const row = document.createElement('div');
+    row.className = 'hour-row';
+    const label = document.createElement('div');
+    label.className = 'hour-label';
+    const hr = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    const ampm = h < 12 ? 'AM' : 'PM';
+    label.textContent = `${hr} ${ampm}`;
+    row.appendChild(label);
+    tl.appendChild(row);
+  }
+
+  // events layer
+  const layer = document.createElement('div');
+  layer.className = 'events-layer';
+  tl.appendChild(layer);
+
+  function timeToMinutes(t) {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  // Group overlapping events into columns
+  const sorted = [...events].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+
+  // Simple lane assignment: greedy
+  const lanes = [];
+  sorted.forEach(ev => {
+    const startMin = timeToMinutes(ev.start);
+    const endMin = timeToMinutes(ev.end);
+    let placed = false;
+    for (let i = 0; i < lanes.length; i++) {
+      if (lanes[i] <= startMin) {
+        ev._lane = i;
+        lanes[i] = endMin;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      ev._lane = lanes.length;
+      lanes.push(endMin);
+    }
+  });
+
+  const totalLanes = lanes.length || 1;
+
+  sorted.forEach(ev => {
+    const startMin = timeToMinutes(ev.start) - startHour * 60;
+    const endMin = timeToMinutes(ev.end) - startHour * 60;
+    const top = (startMin / 60) * pxPerHour;
+    const height = ((endMin - startMin) / 60) * pxPerHour - 2;
+    const widthPct = 100 / totalLanes;
+    const leftPct = ev._lane * widthPct;
+
+    const el = document.createElement('div');
+    el.className = `event ${ev.person}`;
+    el.style.top = `${top}px`;
+    el.style.height = `${height}px`;
+    el.style.left = `calc(${leftPct}% + 2px)`;
+    el.style.width = `calc(${widthPct}% - 4px)`;
+    el.innerHTML = `<div class="title">${ev.title}</div><div class="time">${formatTime(ev.start)}–${formatTime(ev.end)}</div>`;
+    layer.appendChild(el);
+  });
+
+  function formatTime(t) {
+    const [h, m] = t.split(':').map(Number);
+    const hr = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    const ampm = h < 12 ? 'a' : 'p';
+    return m === 0 ? `${hr}${ampm}` : `${hr}:${String(m).padStart(2,'0')}${ampm}`;
+  }
+
+  // --- Now line ---
+  function drawNow() {
+    const now = new Date();
+    const minsFromStart = (now.getHours() - startHour) * 60 + now.getMinutes();
+    if (minsFromStart < 0 || minsFromStart > (endHour - startHour) * 60) return;
+    const top = (minsFromStart / 60) * pxPerHour;
+    let line = document.querySelector('.now-line');
+    if (!line) {
+      line = document.createElement('div');
+      line.className = 'now-line';
+      layer.appendChild(line);
+    }
+    line.style.top = `${top}px`;
+  }
+  drawNow();
+
+  // --- Clock + date ---
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h < 12 ? 'am' : 'pm';
+    h = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    document.getElementById('clock').textContent = `${h}:${String(m).padStart(2,'0')}${ampm}`;
+    const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+    document.getElementById('date').textContent = now.toLocaleDateString('en-US', opts);
+    drawNow();
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  // --- Tab switching ---
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.body.dataset.tab = t.dataset.tab;
+    });
+  });
+</script>
+</body>
+</html>
