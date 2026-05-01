@@ -81,27 +81,29 @@
     user-select: none;
   }
   .topdate .dow {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    color: var(--ink);
-    text-transform: uppercase;
-  }
-  .topdate .dnum {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 200;
     letter-spacing: -0.02em;
     color: var(--ink);
-    margin-top: 4px;
+    line-height: 1;
+  }
+  .topdate .dnum {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-top: 3px;
     font-variant-numeric: tabular-nums;
+    line-height: 1;
   }
   .topdate .month {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.25em;
     color: var(--mute);
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 5px;
+    font-variant-numeric: tabular-nums;
   }
 
   /* segmented view switcher */
@@ -1257,11 +1259,11 @@
   </div>
   <div class="dev-title">PALETTE</div>
   <div class="dev-row dev-presets">
-    <button class="dev-pal active" data-pal="bright">Bright</button>
+    <button class="dev-pal" data-pal="bright">Bright</button>
     <button class="dev-pal" data-pal="muted">Purple</button>
     <button class="dev-pal" data-pal="earth">Earth</button>
     <button class="dev-pal" data-pal="vivid">Vivid</button>
-    <button class="dev-pal" data-pal="pop">Pop</button>
+    <button class="dev-pal active" data-pal="pop">Pop</button>
     <button class="dev-pal" data-pal="calendar">Calendar</button>
     <button class="dev-pal" data-pal="furniture">Furniture</button>
     <button class="dev-pal" data-pal="stripe">Stripe</button>
@@ -1796,9 +1798,9 @@
   // ============================================================
   function updateTopDate() {
     const now = realNow();
-    document.getElementById('td-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-    document.getElementById('td-num').textContent = pad2(now.getDate());
-    document.getElementById('td-mon').textContent = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase();
+    document.getElementById('td-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
+    document.getElementById('td-num').textContent = `${now.getDate()} ${now.toLocaleDateString('en-US', { month: 'long' })}`;
+    document.getElementById('td-mon').textContent = now.getFullYear();
   }
 
   // ============================================================
@@ -1862,10 +1864,9 @@
       const name = person[0].toUpperCase() + person.slice(1);
       const items = choreState[person] || [];
       const { total, earned } = calcTotals(items);
-      const isWhite = (person === 'lua');
       card.innerHTML = `
         <div class="chore-card-head">
-          <div class="avatar" style="background: var(--${person}); ${isWhite?'color:white;':''}">${initial}</div>
+          <div class="avatar" style="background: var(--${person}); color: var(--${person}-text);">${initial}</div>
           <div class="name">${name}</div>
           <div class="bal"><span class="earned">$${earned.toFixed(2)}</span><span class="of-total"> / $${total.toFixed(2)}</span></div>
         </div>
@@ -2193,7 +2194,7 @@
   // ============================================================
   // DEV PANEL — palette switcher
   // ============================================================
-  let activePalette = 'bright';
+  let activePalette = 'pop';
 
   // Text colours are tinted darks (≈30% of bg) instead of pure black
   // so the letter/text reads as a darker shade of the bg, not a hard contrast
@@ -2466,6 +2467,7 @@
     else if (viewMode === 'month') renderMonth();
     else renderCalendar();
   }
+  applyPalette(activePalette);
   updateTopDate();
   setMode(viewMode);
   setInterval(tick, 30000);
