@@ -1056,9 +1056,6 @@
           <div class="now-rule"></div>
           <div class="now-date" id="now-date">1 MAY 2026</div>
         </div>
-        <div class="now-cards" id="now-cards">
-          <div class="now-card-label">Next up</div>
-        </div>
       </div>
 
       <!-- CALENDAR (single grid that re-renders for any day count) -->
@@ -1525,33 +1522,6 @@
     document.getElementById('now-time').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('now-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
     document.getElementById('now-date').textContent = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
-
-    const root = document.getElementById('now-cards');
-    root.innerHTML = '<div class="now-card-label">Next up</div>';
-    const nowMins = now.getHours() * 60 + now.getMinutes();
-    const nextByPerson = {};
-    const sortedAll = [...events].sort((a, b) => {
-      if (a.d !== b.d) return a.d - b.d;
-      return timeToMinutes(a.start) - timeToMinutes(b.start);
-    });
-    sortedAll.forEach(ev => {
-      if (nextByPerson[ev.p]) return;
-      if (ev.d > 0) { nextByPerson[ev.p] = ev; return; }
-      if (ev.d === 0 && timeToMinutes(ev.end) > nowMins) {
-        nextByPerson[ev.p] = ev; return;
-      }
-    });
-    ['jordan','sarah','phoenix','lua'].forEach(person => {
-      const ev = nextByPerson[person];
-      const card = document.createElement('div');
-      card.className = 'now-card' + (ev ? '' : ' muted');
-      const swatch = `<div class="swatch" style="background: var(--${person});"></div>`;
-      const who = `${person[0].toUpperCase()}${person.slice(1)}`;
-      const what = ev ? ev.t : 'nothing scheduled';
-      const when = ev ? timeUntil(ev) : '—';
-      card.innerHTML = `${swatch}<div class="who">${who}</div><div class="what">${what}</div><div class="when">${when}</div>`;
-      root.appendChild(card);
-    });
   }
 
   // ============================================================
