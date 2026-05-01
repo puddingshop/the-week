@@ -1021,6 +1021,7 @@
     font-variant-numeric: tabular-nums;
     color: var(--mute);
     letter-spacing: 0.04em;
+    margin-bottom: 14px;
   }
 
   /* ============ DEV PANEL ============ */
@@ -1204,10 +1205,14 @@
           <div class="ev-modal-dot" id="ev-modal-dot"></div>
           <div class="ev-modal-who" id="ev-modal-who"></div>
         </div>
-        <button class="modal-cancel" id="ev-modal-close">CLOSE</button>
+        <button class="modal-cancel" id="ev-modal-cancel">CANCEL</button>
       </div>
       <div class="ev-modal-title" id="ev-modal-title"></div>
       <div class="ev-modal-time" id="ev-modal-time"></div>
+      <textarea class="modal-textarea" id="ev-modal-notes" placeholder="Add a note…"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="ev-modal-save">SAVE</button>
+      </div>
     </div>
   </div>
 
@@ -1368,9 +1373,11 @@
   // ============================================================
   let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
   let focusedDayOffset = null; // which day column is colour-revealed, or null
-  let viewMode = 'weekdays'; // weekend / weekdays / week / now / day
+  // Fri/Sat/Sun → weekend; Mon–Thu → weekdays
+  const _startDay = new Date().getDay();
+  let viewMode = (_startDay === 5 || _startDay === 6 || _startDay === 0) ? 'weekend' : 'weekdays';
   let viewDayOffset = 0;     // when in 'day' mode, which day
-  let prevNormalMode = 'weekdays'; // remembers last weekend/weekdays/week
+  let prevNormalMode = viewMode; // remembers last weekend/weekdays
 
   // ============================================================
   // DAY OFFSETS HELPERS
@@ -1604,23 +1611,37 @@
   // ============================================================
   // EVENT DETAIL MODAL
   // ============================================================
+  let currentEventKey = null;
+
   function openEventModal(ev) {
     const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const date = new Date(); date.setDate(date.getDate() + ev.d);
+    const dateKey = date.toISOString().slice(0, 10);
     const dayLabel = dayNames[date.getDay()].toUpperCase();
     const personLabel = ev.p[0].toUpperCase() + ev.p.slice(1);
+    currentEventKey = `evnote-${ev.p}-${dateKey}-${ev.start}`;
     document.getElementById('ev-modal-dot').style.background = `var(--${ev.p})`;
     document.getElementById('ev-modal-who').textContent = `${personLabel} · ${dayLabel}`;
     document.getElementById('ev-modal-title').textContent = ev.t;
     document.getElementById('ev-modal-time').textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+    document.getElementById('ev-modal-notes').value = localStorage.getItem(currentEventKey) || '';
     document.getElementById('ev-modal').classList.add('shown');
   }
   function closeEventModal() {
     document.getElementById('ev-modal').classList.remove('shown');
+    currentEventKey = null;
   }
-  document.getElementById('ev-modal-close').addEventListener('click', closeEventModal);
+  document.getElementById('ev-modal-cancel').addEventListener('click', closeEventModal);
   document.getElementById('ev-modal').addEventListener('click', (e) => {
     if (e.target.id === 'ev-modal') closeEventModal();
+  });
+  document.getElementById('ev-modal-save').addEventListener('click', () => {
+    const note = document.getElementById('ev-modal-notes').value.trim();
+    if (currentEventKey) {
+      if (note) localStorage.setItem(currentEventKey, note);
+      else localStorage.removeItem(currentEventKey);
+    }
+    closeEventModal();
   });
 
   // ============================================================
@@ -2200,7 +2221,8 @@
     else if (viewMode === 'month') renderMonth();
     else renderCalendar();
   }
-  tick();
+  updateTopDate();
+  setMode(viewMode);
   setInterval(tick, 30000);
 </script>
 </body>
