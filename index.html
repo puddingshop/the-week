@@ -223,7 +223,8 @@
   .nt-bottom {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
+    line-height: 1;
   }
   .nt-weekday {
     font-size: 27px;
@@ -1751,9 +1752,12 @@
         renderCalendar();
       }
     };
-    const shouldUseTransition = document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && viewMode !== 'unset';
-    if (shouldUseTransition) {
-      document.startViewTransition(swap);
+    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      try {
+        document.startViewTransition(swap);
+      } catch {
+        swap();
+      }
     } else {
       swap();
     }
