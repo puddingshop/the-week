@@ -195,87 +195,50 @@
   /* ============ NOW VIEW ============ */
   #view-now {
     background: var(--bg);
-    padding: 0;
+    padding: 28px 28px 32px;
     flex-direction: column;
-    position: relative;
+    justify-content: space-between;
     cursor: pointer;
   }
-
-  .nt-year-band {
-    text-align: center;
-    font-size: 8px;
-    letter-spacing: 0.55em;
-    color: var(--faint);
-    font-weight: 700;
-    padding: 13px 0 11px;
-    border-bottom: 1px solid var(--hair);
-    font-variant-numeric: tabular-nums;
-    text-transform: uppercase;
-  }
-
-  .nt-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
-    grid-template-rows: 1fr 1fr;
-    min-height: 0;
-  }
-  .nt-cell {
+  .nt-meta {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    padding: 12px 16px 16px;
-    overflow: hidden;
-    position: relative;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--faint);
   }
-  .nt-cell.month-cell { border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
-  .nt-cell.day-cell   { border-bottom: 1px solid var(--hair); }
-  .nt-cell.time-cell  { border-right: 1px solid var(--hair); }
-  .nt-cell.dow-cell   { background: var(--accent); justify-content: center; align-items: center; padding: 0; }
-
-  .nt-month {
-    font-size: clamp(52px, 12vw, 82px);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 0.95;
-    color: var(--ink);
-  }
-  .nt-day {
-    font-size: clamp(130px, 26vw, 210px);
-    font-weight: 800;
-    letter-spacing: -0.07em;
-    line-height: 0.82;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-    margin-left: -0.04em;
+  .nt-time-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
   }
   .nt-time {
-    font-size: clamp(52px, 12vw, 82px);
+    font-size: clamp(88px, 24vw, 152px);
     font-weight: 200;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
     color: var(--ink);
     line-height: 1;
     white-space: nowrap;
   }
   .nt-time .ampm {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--mute);
-    margin-left: 5px;
-    letter-spacing: 0.2em;
+    margin-left: 6px;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     font-weight: 700;
-    vertical-align: 0.6em;
+    vertical-align: 0.65em;
   }
-  .nt-dow {
-    font-size: clamp(22px, 5.5vw, 36px);
+  .nt-date {
+    font-size: clamp(44px, 11vw, 72px);
     font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: white;
+    letter-spacing: -0.03em;
+    color: var(--ink);
     line-height: 1;
-    text-align: center;
   }
 
   /* ============ CALENDAR GRID ============ */
@@ -1114,13 +1077,14 @@
 
       <!-- NOW (standby / home) -->
       <div class="view" id="view-now">
-        <div class="nt-year-band" id="nt-year">2026</div>
-        <div class="nt-grid">
-          <div class="nt-cell month-cell"><span class="nt-month" id="nt-month">May</span></div>
-          <div class="nt-cell day-cell"><span class="nt-day" id="nt-day">02</span></div>
-          <div class="nt-cell time-cell"><span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span></div>
-          <div class="nt-cell dow-cell"><span class="nt-dow" id="nt-dow-big">FRIDAY</span></div>
+        <div class="nt-meta">
+          <span id="nt-dow-big">FRIDAY</span>
+          <span id="nt-year">2026</span>
         </div>
+        <div class="nt-time-wrap">
+          <span class="nt-time" id="nt-time-big">11:15<span class="ampm">am</span></span>
+        </div>
+        <div class="nt-date" id="nt-date">2 May</div>
       </div>
 
       <!-- CALENDAR (single grid that re-renders for any day count) -->
@@ -1694,15 +1658,15 @@
 
   function renderNow() {
     const now = realNow();
-    let h = now.getHours();
+    const h = now.getHours();
     const m = now.getMinutes();
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+    const month = now.toLocaleDateString('en-US', { month: 'long' });
     document.getElementById('nt-year').textContent = now.getFullYear();
-    document.getElementById('nt-month').textContent = now.toLocaleDateString('en-US', { month: 'long' });
-    document.getElementById('nt-day').textContent = pad2(now.getDate());
-    document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
+    document.getElementById('nt-date').textContent = `${now.getDate()} ${month}`;
   }
 
   // ============================================================
