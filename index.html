@@ -168,10 +168,10 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
   }
-  .person[data-color="jordan"]  .avatar { background: transparent; border-color: var(--jordan);  color: var(--jordan); }
-  .person[data-color="sarah"]   .avatar { background: transparent; border-color: var(--sarah);   color: var(--sarah); }
-  .person[data-color="phoenix"] .avatar { background: transparent; border-color: var(--phoenix); color: var(--phoenix); }
-  .person[data-color="lua"]     .avatar { background: transparent; border-color: var(--lua);     color: var(--lua); }
+  .person[data-color="jordan"]  .avatar { background: var(--jordan);  color: var(--jordan-text); }
+  .person[data-color="sarah"]   .avatar { background: var(--sarah);   color: var(--sarah-text); }
+  .person[data-color="phoenix"] .avatar { background: var(--phoenix); color: var(--phoenix-text); }
+  .person[data-color="lua"]     .avatar { background: var(--lua);     color: var(--lua-text); }
 
   body[data-focus] .person:not(.focused) { opacity: 0.35; }
   .person.focused .avatar {
@@ -1059,7 +1059,8 @@
     font-variant-numeric: tabular-nums;
     color: white;
   }
-  .dev-row .dev-preset {
+  .dev-row .dev-pal { }
+  .dev-row .dev-preset, .dev-row .dev-pal {
     background: rgba(255,255,255,0.1);
     border: none;
     color: white;
@@ -1070,8 +1071,8 @@
     cursor: pointer;
     letter-spacing: 0.05em;
   }
-  .dev-row .dev-preset:hover { background: rgba(255,255,255,0.2); }
-  .dev-row .dev-preset.active { background: var(--accent); }
+  .dev-row .dev-preset:hover, .dev-row .dev-pal:hover { background: rgba(255,255,255,0.2); }
+  .dev-row .dev-preset.active, .dev-row .dev-pal.active { background: var(--accent); }
   .dev-presets { gap: 4px; flex-wrap: wrap; }
 
 </style>
@@ -1245,9 +1246,9 @@
   </div>
   <div class="dev-title">PALETTE</div>
   <div class="dev-row dev-presets">
-    <button class="dev-preset dev-pal active" data-pal="bright">Bright</button>
-    <button class="dev-preset dev-pal" data-pal="muted">Purple</button>
-    <button class="dev-preset dev-pal" data-pal="earth">Earth</button>
+    <button class="dev-pal active" data-pal="bright">Bright</button>
+    <button class="dev-pal" data-pal="muted">Purple</button>
+    <button class="dev-pal" data-pal="earth">Earth</button>
   </div>
   <div class="dev-title">FRAME</div>
   <div class="dev-row">
