@@ -126,7 +126,7 @@
     color: var(--ink);
     box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04);
   }
-  .seg-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .seg-btn svg { width: 18px; height: 18px; fill: currentColor; stroke: none; }
 
   /* ============ PEOPLE ============ */
   .people {
@@ -350,6 +350,19 @@
   }
   .dh.today .dh-dow { color: var(--accent); }
   .dh.today .dh-num { color: var(--accent); }
+
+  /* View Transition (smooth zoom between modes) */
+  @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-group(*) {
+      animation-duration: 0.5s;
+      animation-timing-function: cubic-bezier(0.32, 0.72, 0.24, 1);
+    }
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation-duration: 0.5s;
+      animation-timing-function: cubic-bezier(0.32, 0.72, 0.24, 1);
+    }
+  }
 
   /* Single-day mode: Stendig hero header */
   body[data-mode="day"] .dh {
@@ -980,7 +993,8 @@
       dh.dataset.offset = off;
       const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
       const dnum = d.getDate();
-      dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num">${dnum}</div>`;
+      const safeOff = off < 0 ? `n${-off}` : `p${off}`;
+      dh.innerHTML = `<div class="dh-dow">${dow}</div><div class="dh-num" style="view-transition-name: dnum-${safeOff};">${dnum}</div>`;
       dh.addEventListener('click', (e) => {
         e.stopPropagation();
         if (viewMode === 'day') {
@@ -1031,23 +1045,47 @@
       // events for this day
       const dayEvents = events.filter(e => e.d === off);
       const sorted = [...dayEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
-      const lanes = [];
+
+      // Build clusters: contiguous chains of overlapping events.
+      // Width is shared only within a cluster; isolated events get full width.
+      const clusters = [];
+      let cur = [];
+      let curEnd = -1;
       sorted.forEach(ev => {
         const s = timeToMinutes(ev.start);
         const e = timeToMinutes(ev.end);
-        let placed = false;
-        for (let i = 0; i < lanes.length; i++) {
-          if (lanes[i] <= s) { ev._lane = i; lanes[i] = e; placed = true; break; }
+        if (s >= curEnd) {
+          if (cur.length) clusters.push(cur);
+          cur = [ev];
+          curEnd = e;
+        } else {
+          cur.push(ev);
+          curEnd = Math.max(curEnd, e);
         }
-        if (!placed) { ev._lane = lanes.length; lanes.push(e); }
       });
-      const totalLanes = Math.max(lanes.length, 1);
+      if (cur.length) clusters.push(cur);
+
+      clusters.forEach(cluster => {
+        const lanes = [];
+        cluster.forEach(ev => {
+          const s = timeToMinutes(ev.start);
+          const e = timeToMinutes(ev.end);
+          let placed = false;
+          for (let i = 0; i < lanes.length; i++) {
+            if (lanes[i] <= s) { ev._lane = i; lanes[i] = e; placed = true; break; }
+          }
+          if (!placed) { ev._lane = lanes.length; lanes.push(e); }
+        });
+        const clusterLanes = Math.max(lanes.length, 1);
+        cluster.forEach(ev => { ev._totalLanes = clusterLanes; });
+      });
+
       sorted.forEach(ev => {
         const sMin = timeToMinutes(ev.start) - START_HOUR * 60;
         const eMin = timeToMinutes(ev.end) - START_HOUR * 60;
         const topPct = (sMin / (TOTAL_HOURS * 60)) * 100;
         const heightPct = ((eMin - sMin) / (TOTAL_HOURS * 60)) * 100;
-        const widthPct = 100 / totalLanes;
+        const widthPct = 100 / ev._totalLanes;
         const leftPct = ev._lane * widthPct;
 
         const isPast = (ev.d === 0 && timeToMinutes(ev.end) <= nowMins) || ev.d < 0;
@@ -1142,20 +1180,27 @@
   // VIEW MODE SWITCH
   // ============================================================
   function setMode(mode, offset) {
-    if (['weekend','weekdays','week'].includes(viewMode)) {
-      prevNormalMode = viewMode;
-    }
-    viewMode = mode;
-    if (typeof offset === 'number') viewDayOffset = offset;
-    document.body.dataset.mode = mode;
-    document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    if (mode === 'now') {
-      document.getElementById('view-now').classList.add('active');
-      renderNow();
+    const swap = () => {
+      if (['weekend','weekdays','week'].includes(viewMode)) {
+        prevNormalMode = viewMode;
+      }
+      viewMode = mode;
+      if (typeof offset === 'number') viewDayOffset = offset;
+      document.body.dataset.mode = mode;
+      document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      if (mode === 'now') {
+        document.getElementById('view-now').classList.add('active');
+        renderNow();
+      } else {
+        document.getElementById('view-cal').classList.add('active');
+        renderCalendar();
+      }
+    };
+    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(swap);
     } else {
-      document.getElementById('view-cal').classList.add('active');
-      renderCalendar();
+      swap();
     }
   }
   document.querySelectorAll('.seg-btn').forEach(b => {
