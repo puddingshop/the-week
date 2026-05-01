@@ -277,14 +277,11 @@
   .dh .dh-dow {
     font-size: 9px;
     font-weight: 600;
-    letter-spacing: 0.2em;
     color: var(--mute);
-    text-transform: uppercase;
   }
   .dh .dh-num {
     font-size: 18px;
     font-weight: 600;
-    letter-spacing: -0.03em;
     color: var(--ink);
     line-height: 1;
     margin-top: 3px;
@@ -309,12 +306,10 @@
   }
   body[data-mode="day"] .dh .dh-dow {
     font-size: 11px;
-    letter-spacing: 0.35em;
     margin-bottom: 8px;
   }
   body[data-mode="day"] .dh .dh-num {
     font-size: 72px;
-    letter-spacing: -0.05em;
     line-height: 0.85;
     font-weight: 600;
   }
@@ -1747,7 +1742,14 @@
     }
   }
   document.querySelectorAll('.seg-btn').forEach(b => {
-    b.addEventListener('click', () => setMode(b.dataset.mode));
+    b.addEventListener('click', () => {
+      // if currently in day mode, preserve the day selection
+      if (viewMode === 'day') {
+        setMode(b.dataset.mode, viewDayOffset);
+      } else {
+        setMode(b.dataset.mode);
+      }
+    });
   });
 
   // tap top date → NOW
@@ -2451,7 +2453,7 @@
           cell.appendChild(dotsEl);
         }
 
-        cell.addEventListener('click', () => setMode('weekdays'));
+        cell.addEventListener('click', () => setMode('day', diff));
         weekEl.appendChild(cell);
       }
       root.appendChild(weekEl);
