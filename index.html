@@ -629,6 +629,273 @@
   .tab svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .tab.active { color: var(--ink); }
 
+  /* ============ MEALS ============ */
+  .meals-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .meal-day {
+    border-bottom: 1px solid var(--hair);
+    padding: 10px 0 11px;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 14px;
+    align-items: start;
+    transition: background 0.15s;
+  }
+  .meal-day:hover { background: rgba(0,0,0,0.015); }
+  .meal-day.today .md-dow,
+  .meal-day.today .md-num { color: var(--accent); }
+  .md-head { line-height: 1; }
+  .md-dow {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--mute);
+    text-transform: uppercase;
+  }
+  .md-num {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    margin-top: 4px;
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+  .meal-slot {
+    padding-top: 4px;
+  }
+  .meal-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .meal-empty {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .meal-ings {
+    font-size: 11px;
+    color: var(--mute);
+    margin-top: 3px;
+    line-height: 1.35;
+  }
+
+  /* meal editor (modal) */
+  .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(2px);
+  }
+  .modal-backdrop.shown { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 12px 12px 0 0;
+    width: 100%;
+    padding: 18px 18px 16px;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.18);
+    animation: slideUp 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .modal-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .modal-cancel {
+    background: none;
+    border: none;
+    color: var(--mute);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .modal-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: 10px;
+  }
+  .modal-textarea {
+    width: 100%;
+    border: 1px solid var(--hair);
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 8px;
+    border-radius: 6px;
+    resize: vertical;
+    min-height: 90px;
+    margin-bottom: 4px;
+  }
+  .modal-hint {
+    font-size: 10px;
+    color: var(--faint);
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  .btn {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary { background: var(--ink); color: white; flex: 1; }
+  .btn-primary:hover { background: #000; }
+  .btn-danger { background: transparent; color: #c64; }
+  .btn-danger:hover { background: #fff0eb; }
+
+  /* ============ SHOP ============ */
+  .shop-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .shop-section { display: flex; flex-direction: column; gap: 2px; }
+  .shop-head {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--mute);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .shop-item {
+    display: grid;
+    grid-template-columns: 16px 1fr auto 18px;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--hair);
+  }
+  .shop-item:last-child { border-bottom: none; }
+  .shop-check {
+    width: 14px; height: 14px;
+    border: 1.3px solid #c0c0c0;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .shop-check.done { background: var(--ink); border-color: var(--ink); }
+  .shop-check.done::after {
+    content: ''; width: 6px; height: 3px;
+    border-left: 1.3px solid white;
+    border-bottom: 1.3px solid white;
+    transform: rotate(-45deg) translate(0.5px,-1px);
+  }
+  .shop-text {
+    font-size: 13px;
+    color: var(--ink);
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 1px 0;
+    font-family: inherit;
+    width: 100%;
+  }
+  .shop-item.done .shop-text { text-decoration: line-through; color: var(--faint); }
+  .shop-count {
+    font-size: 10px;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+  }
+  .shop-source {
+    font-size: 9px;
+    color: var(--faint);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .shop-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--faint); font-size: 13px; line-height: 1;
+    padding: 1px 3px;
+  }
+  .shop-del:hover { color: #c64; }
+  .shop-add {
+    margin-top: 4px;
+    background: none;
+    border: 1px dashed #d0d0d0;
+    border-radius: 5px;
+    padding: 6px;
+    font-size: 11px;
+    color: var(--mute);
+    cursor: pointer;
+    width: 100%;
+    font-family: inherit;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .shop-add:hover { border-color: var(--ink); color: var(--ink); }
+  .shop-clear {
+    margin-top: 6px;
+    background: transparent;
+    border: none;
+    color: var(--faint);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 6px;
+    text-align: center;
+  }
+  .shop-clear:hover { color: var(--ink); }
+  .shop-empty {
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.05em;
+    padding: 8px 0;
+    text-align: center;
+  }
+
   /* placeholder */
   .placeholder {
     flex: 1;
@@ -809,17 +1076,28 @@
 
   <!-- ===== Meals shell ===== -->
   <div class="meals-shell">
-    <div class="placeholder">
-      <div class="label">Meals</div>
-      <div class="sub">Weekly meal plan — coming soon</div>
-    </div>
+    <div class="meals-scroll" id="meals-scroll"></div>
   </div>
 
   <!-- ===== Shop shell ===== -->
   <div class="shop-shell">
-    <div class="placeholder">
-      <div class="label">Shop</div>
-      <div class="sub">Shared shopping list — coming soon</div>
+    <div class="shop-scroll" id="shop-scroll"></div>
+  </div>
+
+  <!-- ===== Meal editor modal ===== -->
+  <div class="modal-backdrop" id="meal-modal">
+    <div class="modal" onclick="event.stopPropagation();">
+      <div class="modal-head">
+        <div class="modal-title" id="meal-modal-title">DINNER · FRIDAY</div>
+        <button class="modal-cancel" id="meal-modal-cancel">CANCEL</button>
+      </div>
+      <input class="modal-input" id="meal-input-name" placeholder="What's for dinner?" />
+      <textarea class="modal-textarea" id="meal-input-ings" placeholder="Ingredients, one per line&#10;e.g.&#10;mince 500g&#10;passata 1 jar&#10;onion 1"></textarea>
+      <div class="modal-hint">One ingredient per line. They'll auto-appear in the Shop tab.</div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="meal-modal-delete">DELETE</button>
+        <button class="btn btn-primary" id="meal-modal-save">SAVE</button>
+      </div>
     </div>
   </div>
 
@@ -1287,6 +1565,8 @@
       t.classList.add('active');
       document.body.dataset.tab = t.dataset.tab;
       if (t.dataset.tab === 'chores') renderChores();
+      if (t.dataset.tab === 'meals')  renderMeals();
+      if (t.dataset.tab === 'shop')   renderShop();
     });
   });
 
@@ -1387,6 +1667,281 @@
       });
       root.appendChild(card);
     });
+  }
+
+  // ============================================================
+  // MEALS + SHOP
+  // ============================================================
+  const MEALS_KEY = 'theweek.meals.v1';
+  const SHOP_EXTRAS_KEY = 'theweek.shop.extras.v1';
+  const SHOP_CHECKED_KEY = 'theweek.shop.checked.v1';
+
+  function loadMeals() {
+    try { return JSON.parse(localStorage.getItem(MEALS_KEY)) || {}; }
+    catch { return {}; }
+  }
+  function saveMeals(m) { localStorage.setItem(MEALS_KEY, JSON.stringify(m)); }
+  function loadShopExtras() {
+    try { return JSON.parse(localStorage.getItem(SHOP_EXTRAS_KEY)) || []; }
+    catch { return []; }
+  }
+  function saveShopExtras(x) { localStorage.setItem(SHOP_EXTRAS_KEY, JSON.stringify(x)); }
+  function loadShopChecked() {
+    try { return JSON.parse(localStorage.getItem(SHOP_CHECKED_KEY)) || {}; }
+    catch { return {}; }
+  }
+  function saveShopChecked(c) { localStorage.setItem(SHOP_CHECKED_KEY, JSON.stringify(c)); }
+
+  let mealsState = loadMeals();
+  let shopExtras = loadShopExtras();
+  let shopChecked = loadShopChecked();
+
+  function dateKey(d) {
+    const y = d.getFullYear();
+    const m = pad2(d.getMonth() + 1);
+    const day = pad2(d.getDate());
+    return `${y}-${m}-${day}`;
+  }
+
+  function weekDates() {
+    const today = realNow();
+    const dow = today.getDay(); // 0=Sun
+    const mondayOffset = dow === 0 ? -6 : (1 - dow);
+    return [0,1,2,3,4,5,6].map(i => {
+      const d = new Date(today);
+      d.setDate(d.getDate() + mondayOffset + i);
+      d.setHours(0,0,0,0);
+      return d;
+    });
+  }
+
+  function renderMeals() {
+    const root = document.getElementById('meals-scroll');
+    root.innerHTML = '';
+    const dates = weekDates();
+    const todayKey = dateKey(realNow());
+    dates.forEach(d => {
+      const key = dateKey(d);
+      const meal = mealsState[key];
+      const row = document.createElement('div');
+      row.className = 'meal-day' + (key === todayKey ? ' today' : '');
+      row.dataset.key = key;
+      const dow = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+      const dayNum = d.getDate();
+      let slotHTML;
+      if (meal && meal.name) {
+        const ingPreview = (meal.ingredients || [])
+          .filter(Boolean)
+          .slice(0, 3)
+          .join(' · ');
+        const more = (meal.ingredients || []).filter(Boolean).length - 3;
+        slotHTML = `
+          <div class="meal-name">${escapeHTML(meal.name)}</div>
+          ${ingPreview ? `<div class="meal-ings">${escapeHTML(ingPreview)}${more > 0 ? ` · +${more} more` : ''}</div>` : ''}
+        `;
+      } else {
+        slotHTML = `<div class="meal-empty">+ Add dinner</div>`;
+      }
+      row.innerHTML = `
+        <div class="md-head">
+          <div class="md-dow">${dow}</div>
+          <span class="md-num">${dayNum}</span>
+        </div>
+        <div class="meal-slot">${slotHTML}</div>
+      `;
+      row.addEventListener('click', () => openMealModal(key, d));
+      root.appendChild(row);
+    });
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // --- Modal ---
+  let editingKey = null;
+  function openMealModal(key, dateObj) {
+    editingKey = key;
+    const meal = mealsState[key] || { name: '', ingredients: [] };
+    const dowFull = dateObj.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+    document.getElementById('meal-modal-title').textContent = `DINNER · ${dowFull}`;
+    document.getElementById('meal-input-name').value = meal.name || '';
+    document.getElementById('meal-input-ings').value = (meal.ingredients || []).join('\n');
+    document.getElementById('meal-modal-delete').style.display = (meal.name ? 'inline-block' : 'none');
+    document.getElementById('meal-modal').classList.add('shown');
+    setTimeout(() => document.getElementById('meal-input-name').focus(), 50);
+  }
+  function closeMealModal() {
+    document.getElementById('meal-modal').classList.remove('shown');
+    editingKey = null;
+  }
+  document.getElementById('meal-modal-cancel').addEventListener('click', closeMealModal);
+  document.getElementById('meal-modal').addEventListener('click', (e) => {
+    if (e.target.id === 'meal-modal') closeMealModal();
+  });
+  document.getElementById('meal-modal-save').addEventListener('click', () => {
+    if (!editingKey) return;
+    const name = document.getElementById('meal-input-name').value.trim();
+    const ings = document.getElementById('meal-input-ings').value
+      .split('\n').map(s => s.trim()).filter(Boolean);
+    if (!name && ings.length === 0) {
+      delete mealsState[editingKey];
+    } else {
+      mealsState[editingKey] = { name, ingredients: ings };
+    }
+    saveMeals(mealsState);
+    renderMeals();
+    renderShop();
+    closeMealModal();
+  });
+  document.getElementById('meal-modal-delete').addEventListener('click', () => {
+    if (!editingKey) return;
+    delete mealsState[editingKey];
+    saveMeals(mealsState);
+    renderMeals();
+    renderShop();
+    closeMealModal();
+  });
+
+  // ============================================================
+  // SHOP
+  // ============================================================
+  function aggregateFromMeals() {
+    // walk current week's meals, dedupe by lowercase name
+    const dates = weekDates().map(dateKey);
+    const counts = {}; // lowercase => { display, count }
+    dates.forEach(k => {
+      const meal = mealsState[k];
+      if (!meal || !meal.ingredients) return;
+      meal.ingredients.forEach(ing => {
+        const trimmed = String(ing).trim();
+        if (!trimmed) return;
+        const key = trimmed.toLowerCase();
+        if (!counts[key]) counts[key] = { display: trimmed, count: 0 };
+        counts[key].count++;
+      });
+    });
+    return Object.entries(counts).map(([key, v]) => ({ key, display: v.display, count: v.count }));
+  }
+
+  function renderShop() {
+    const root = document.getElementById('shop-scroll');
+    root.innerHTML = '';
+
+    // ----- From meals section -----
+    const mealItems = aggregateFromMeals();
+    const mealsSection = document.createElement('div');
+    mealsSection.className = 'shop-section';
+    mealsSection.innerHTML = `<div class="shop-head">From Meals</div>`;
+    if (mealItems.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'shop-empty';
+      empty.textContent = 'No dinners planned yet';
+      mealsSection.appendChild(empty);
+    } else {
+      mealItems.forEach(item => {
+        const isDone = !!shopChecked[`m:${item.key}`];
+        const row = document.createElement('div');
+        row.className = 'shop-item' + (isDone ? ' done' : '');
+        row.innerHTML = `
+          <div class="shop-check ${isDone ? 'done' : ''}"></div>
+          <div class="shop-text">${escapeHTML(item.display)}</div>
+          <div class="shop-count">${item.count > 1 ? '×' + item.count : ''}</div>
+          <div></div>
+        `;
+        row.querySelector('.shop-check').addEventListener('click', () => {
+          shopChecked[`m:${item.key}`] = !isDone;
+          if (!shopChecked[`m:${item.key}`]) delete shopChecked[`m:${item.key}`];
+          saveShopChecked(shopChecked);
+          renderShop();
+        });
+        mealsSection.appendChild(row);
+      });
+    }
+    root.appendChild(mealsSection);
+
+    // ----- Extras section -----
+    const extrasSection = document.createElement('div');
+    extrasSection.className = 'shop-section';
+    extrasSection.innerHTML = `<div class="shop-head">Extras</div>`;
+    shopExtras.forEach((extra, idx) => {
+      const checkKey = `e:${idx}`;
+      const isDone = !!shopChecked[checkKey];
+      const row = document.createElement('div');
+      row.className = 'shop-item' + (isDone ? ' done' : '');
+      row.innerHTML = `
+        <div class="shop-check ${isDone ? 'done' : ''}"></div>
+        <input class="shop-text" value="${escapeHTML(extra)}" placeholder="Item..." />
+        <div></div>
+        <button class="shop-del">×</button>
+      `;
+      row.querySelector('.shop-check').addEventListener('click', () => {
+        shopChecked[checkKey] = !isDone;
+        if (!shopChecked[checkKey]) delete shopChecked[checkKey];
+        saveShopChecked(shopChecked);
+        renderShop();
+      });
+      row.querySelector('.shop-text').addEventListener('change', e => {
+        shopExtras[idx] = e.target.value;
+        saveShopExtras(shopExtras);
+      });
+      row.querySelector('.shop-del').addEventListener('click', () => {
+        shopExtras.splice(idx, 1);
+        // re-key: shift checked indices for items after this one
+        const newChecked = {};
+        Object.keys(shopChecked).forEach(k => {
+          if (k.startsWith('e:')) {
+            const i = parseInt(k.slice(2));
+            if (i < idx) newChecked[k] = shopChecked[k];
+            else if (i > idx) newChecked[`e:${i-1}`] = shopChecked[k];
+            // i === idx is dropped
+          } else {
+            newChecked[k] = shopChecked[k];
+          }
+        });
+        shopChecked = newChecked;
+        saveShopExtras(shopExtras);
+        saveShopChecked(shopChecked);
+        renderShop();
+      });
+      extrasSection.appendChild(row);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'shop-add';
+    addBtn.textContent = '+ Add item';
+    addBtn.addEventListener('click', () => {
+      shopExtras.push('');
+      saveShopExtras(shopExtras);
+      renderShop();
+      // focus the new input
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('.shop-shell .shop-text');
+        const last = inputs[inputs.length - 1];
+        if (last && last.tagName === 'INPUT') last.focus();
+      }, 30);
+    });
+    extrasSection.appendChild(addBtn);
+    root.appendChild(extrasSection);
+
+    // Clear bought
+    if (Object.keys(shopChecked).length > 0) {
+      const clear = document.createElement('button');
+      clear.className = 'shop-clear';
+      clear.textContent = `Clear bought (${Object.keys(shopChecked).length})`;
+      clear.addEventListener('click', () => {
+        // remove checked extras from list, clear all checked state
+        const newExtras = [];
+        shopExtras.forEach((extra, idx) => {
+          if (!shopChecked[`e:${idx}`]) newExtras.push(extra);
+        });
+        shopExtras = newExtras;
+        shopChecked = {};
+        saveShopExtras(shopExtras);
+        saveShopChecked(shopChecked);
+        renderShop();
+      });
+      root.appendChild(clear);
+    }
   }
 
   // ============================================================
