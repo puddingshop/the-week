@@ -415,10 +415,10 @@
   }
 
   /* events */
+  /* base: grey pill (non-colour columns) */
   .ev {
     position: absolute;
-    left: 1px;
-    right: 1px;
+    left: 1px; right: 1px;
     border-radius: 4px;
     padding: 3px 5px;
     font-size: 9px;
@@ -426,68 +426,50 @@
     overflow: hidden;
     transition: opacity 0.35s ease, filter 0.35s ease, transform 0.18s ease;
     cursor: pointer;
+    background: #ebebeb;
+    border: 1.25px solid #d8d8d8;
+    color: #999;
+    filter: none;
+    opacity: 0.88;
+  }
+  .ev .t { font-weight: 600; font-size: 9px; letter-spacing: -0.01em; }
+  .ev .when { font-size: 8px; color: #bbb; margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+  /* colour columns: today + single-day zoom + focused-day tap */
+  .col.show-color .ev,
+  .col.focused-day .ev {
     background: white;
     border: 1.25px solid;
     color: var(--ink);
-    filter: saturate(0);
-    opacity: 0.5;
-  }
-  .ev .t { font-weight: 600; font-size: 9px; letter-spacing: -0.01em; }
-  .ev .when { font-size: 8px; color: var(--mute); margin-top: 1px; font-variant-numeric: tabular-nums; }
-
-  .ev[data-p="jordan"]  { border-color: var(--jordan); }
-  .ev[data-p="sarah"]   { border-color: var(--sarah); }
-  .ev[data-p="phoenix"] { border-color: var(--phoenix); }
-  .ev[data-p="lua"]     { border-color: var(--lua); }
-
-  /* state: next-up = saturated fill */
-  .ev.next[data-p="jordan"]  { background: var(--jordan);  }
-  .ev.next[data-p="sarah"]   { background: var(--sarah);   color: white; }
-  .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.8); }
-  .ev.next[data-p="phoenix"] { background: var(--phoenix); }
-  .ev.next[data-p="lua"]     { background: var(--lua);     color: white; }
-  .ev.next[data-p="lua"] .when { color: rgba(255,255,255,0.8); }
-  .ev.next {
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    filter: none;
-    opacity: 1;
-  }
-
-  /* state: past = ghosted */
-  .ev.past {
-    opacity: 0.15;
-    filter: saturate(0);
-  }
-
-  /* single-day zoom: always show full colour system */
-  body[data-mode="day"] .ev               { filter: saturate(0.45); opacity: 0.72; }
-  body[data-mode="day"] .ev.next          { filter: none; opacity: 1; }
-  body[data-mode="day"] .ev.past          { filter: saturate(0.25); opacity: 0.15; }
-
-  /* day-focus: tap a day header to reveal its colours */
-  body[data-day-focus]:not([data-focus]) .col.focused-day .ev {
     filter: saturate(0.45);
     opacity: 0.72;
   }
-  body[data-day-focus]:not([data-focus]) .col.focused-day .ev.next {
-    filter: none;
-    opacity: 1;
-  }
-  body[data-day-focus]:not([data-focus]) .col.focused-day .ev.past {
-    filter: saturate(0.25);
-    opacity: 0.15;
-  }
+  .col.show-color .ev .when,
+  .col.focused-day .ev .when { color: var(--mute); }
 
-  /* in-focus events go full saturation when an avatar is tapped */
-  body[data-focus] .ev.in-focus {
-    filter: none;
-    opacity: 1;
-  }
+  .col.show-color .ev[data-p="jordan"],  .col.focused-day .ev[data-p="jordan"]  { border-color: var(--jordan); }
+  .col.show-color .ev[data-p="sarah"],   .col.focused-day .ev[data-p="sarah"]   { border-color: var(--sarah); }
+  .col.show-color .ev[data-p="phoenix"], .col.focused-day .ev[data-p="phoenix"] { border-color: var(--phoenix); }
+  .col.show-color .ev[data-p="lua"],     .col.focused-day .ev[data-p="lua"]     { border-color: var(--lua); }
 
-  /* state: focused away (some other person tapped) */
+  .col.show-color .ev.next,
+  .col.focused-day .ev.next { filter: none; opacity: 1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  .col.show-color .ev.next[data-p="jordan"],  .col.focused-day .ev.next[data-p="jordan"]  { background: var(--jordan); }
+  .col.show-color .ev.next[data-p="sarah"],   .col.focused-day .ev.next[data-p="sarah"]   { background: var(--sarah);   color: white; }
+  .col.show-color .ev.next[data-p="phoenix"], .col.focused-day .ev.next[data-p="phoenix"] { background: var(--phoenix); }
+  .col.show-color .ev.next[data-p="lua"],     .col.focused-day .ev.next[data-p="lua"]     { background: var(--lua);     color: white; }
+  .col.show-color .ev.next[data-p="sarah"] .when,  .col.focused-day .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.8); }
+  .col.show-color .ev.next[data-p="lua"] .when,    .col.focused-day .ev.next[data-p="lua"] .when   { color: rgba(255,255,255,0.8); }
+
+  .col.show-color .ev.past,
+  .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
+
+  /* avatar focus */
+  body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
-    border-color: var(--faint);
+    border-color: var(--faint) !important;
     background: transparent !important;
     color: var(--faint) !important;
     box-shadow: none;
@@ -1116,9 +1098,6 @@
         <button class="seg-btn active" data-mode="weekdays" title="Weekdays">
           <svg viewBox="0 0 24 24"><rect x="3" y="6" width="2.6" height="12" rx="0.6"/><rect x="6.8" y="6" width="2.6" height="12" rx="0.6"/><rect x="10.6" y="6" width="2.6" height="12" rx="0.6"/><rect x="14.4" y="6" width="2.6" height="12" rx="0.6"/><rect x="18.2" y="6" width="2.6" height="12" rx="0.6"/></svg>
         </button>
-        <button class="seg-btn" data-mode="week" title="Full week">
-          <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="5.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="8.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="11.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="14.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="17.5" y="6" width="2.1" height="12" rx="0.5"/><rect x="20.5" y="6" width="2.1" height="12" rx="0.5"/></svg>
-        </button>
         <button class="seg-btn" data-mode="month" title="Month">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="4" height="4" rx="0.6"/><rect x="10" y="3" width="4" height="4" rx="0.6"/><rect x="17" y="3" width="4" height="4" rx="0.6"/><rect x="3" y="10" width="4" height="4" rx="0.6"/><rect x="10" y="10" width="4" height="4" rx="0.6"/><rect x="17" y="10" width="4" height="4" rx="0.6"/><rect x="3" y="17" width="4" height="4" rx="0.6"/><rect x="10" y="17" width="4" height="4" rx="0.6"/><rect x="17" y="17" width="4" height="4" rx="0.6"/></svg>
         </button>
@@ -1464,8 +1443,9 @@
     // columns + events
     offsets.forEach(off => {
       const isToday = off === 0;
+      const showColor = isToday || viewMode === 'day';
       const col = document.createElement('div');
-      col.className = 'col' + (isToday ? ' today' : '') + (focusedDayOffset === off ? ' focused-day' : '');
+      col.className = 'col' + (isToday ? ' today' : '') + (showColor ? ' show-color' : '') + (focusedDayOffset === off ? ' focused-day' : '');
       for (let h = START_HOUR; h < END_HOUR; h++) {
         const cell = document.createElement('div');
         cell.className = 'hour-cell';
