@@ -1083,6 +1083,12 @@
   .dev-row .dev-preset:hover, .dev-row .dev-pal:hover { background: rgba(255,255,255,0.2); }
   .dev-row .dev-preset.active, .dev-row .dev-pal.active { background: var(--accent); }
   .dev-presets { gap: 4px; flex-wrap: wrap; }
+  .dev-now-swatch {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
 
 </style>
 </head>
@@ -1264,6 +1270,7 @@
   <div class="dev-row">
     <input type="range" id="dev-month" min="0" max="11" step="1" value="4">
     <span class="dev-val" id="dev-month-val">May</span>
+    <span class="dev-now-swatch" id="dev-now-swatch"></span>
   </div>
   <div class="dev-title">FRAME</div>
   <div class="dev-row">
@@ -1782,6 +1789,8 @@
     r.style.setProperty('--now-meta', text === 'white'
       ? 'rgba(255,255,255,0.45)'
       : 'rgba(0,0,0,0.35)');
+    const swatch = document.getElementById('dev-now-swatch');
+    if (swatch) swatch.style.background = bg;
   }
 
   function renderNow() {
@@ -2256,8 +2265,8 @@
     const m = +monthSlider.value;
     fakeMonth = m;
     monthVal.textContent = MONTH_NAMES[m];
-    updateNowBg();
-    if (viewMode === 'now') renderNow();
+    if (viewMode !== 'now') setMode('now');
+    else renderNow();
   });
 
   // DEV PANEL — day simulator
