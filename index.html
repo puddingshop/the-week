@@ -1417,12 +1417,17 @@
       }
     });
 
+    // always keep one highlighted column visible — snap to nearest if today is off-screen
+    const effectiveFocus = offsets.includes(focusedDayOffset)
+      ? focusedDayOffset
+      : (offsets.find(o => o >= 0) ?? offsets[0]);
+
     // columns + events
     offsets.forEach(off => {
       const isToday = off === 0;
-      const showColor = isToday || viewMode === 'day';
+      const showColor = isToday || viewMode === 'day' || off === effectiveFocus;
       const col = document.createElement('div');
-      col.className = 'col' + (isToday ? ' today' : '') + (showColor ? ' show-color' : '') + (focusedDayOffset === off ? ' focused-day' : '');
+      col.className = 'col' + (isToday ? ' today' : '') + (showColor ? ' show-color' : '') + (off === effectiveFocus ? ' focused-day' : '');
       for (let h = START_HOUR; h < END_HOUR; h++) {
         const cell = document.createElement('div');
         cell.className = 'hour-cell';
