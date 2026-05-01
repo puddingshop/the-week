@@ -210,12 +210,13 @@
     padding: 13px 0 11px;
     border-bottom: 1px solid var(--hair);
     font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
   }
 
   .nt-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1fr 1.6fr;
     grid-template-rows: 1fr 1fr;
     min-height: 0;
   }
@@ -224,43 +225,33 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: flex-start;
-    padding: 14px 18px 18px;
+    padding: 12px 16px 16px;
     overflow: hidden;
     position: relative;
   }
   .nt-cell.month-cell { border-right: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
   .nt-cell.day-cell   { border-bottom: 1px solid var(--hair); }
   .nt-cell.time-cell  { border-right: 1px solid var(--hair); }
+  .nt-cell.dow-cell   { background: var(--accent); justify-content: center; align-items: center; padding: 0; }
 
-  .nt-label {
-    position: absolute;
-    top: 13px;
-    left: 18px;
-    font-size: 7.5px;
-    font-weight: 700;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
   .nt-month {
-    font-size: 56px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
+    font-size: clamp(52px, 12vw, 82px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
     color: var(--ink);
-    text-transform: uppercase;
   }
   .nt-day {
-    font-size: clamp(120px, 22vw, 190px);
-    font-weight: 700;
+    font-size: clamp(130px, 26vw, 210px);
+    font-weight: 800;
     letter-spacing: -0.07em;
     line-height: 0.82;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
-    margin-left: -0.03em;
+    margin-left: -0.04em;
   }
   .nt-time {
-    font-size: 68px;
+    font-size: clamp(52px, 12vw, 82px);
     font-weight: 200;
     letter-spacing: -0.04em;
     font-variant-numeric: tabular-nums;
@@ -275,15 +266,16 @@
     letter-spacing: 0.2em;
     text-transform: uppercase;
     font-weight: 700;
-    vertical-align: 0.55em;
+    vertical-align: 0.6em;
   }
   .nt-dow {
-    font-size: 38px;
+    font-size: clamp(22px, 5.5vw, 36px);
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: white;
     line-height: 1;
+    text-align: center;
   }
 
   /* ============ CALENDAR GRID ============ */
@@ -1124,22 +1116,10 @@
       <div class="view" id="view-now">
         <div class="nt-year-band" id="nt-year">2026</div>
         <div class="nt-grid">
-          <div class="nt-cell month-cell">
-            <span class="nt-label">Month</span>
-            <span class="nt-month" id="nt-month">MAY</span>
-          </div>
-          <div class="nt-cell day-cell">
-            <span class="nt-label">Day</span>
-            <span class="nt-day" id="nt-day">02</span>
-          </div>
-          <div class="nt-cell time-cell">
-            <span class="nt-label">Time</span>
-            <span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span>
-          </div>
-          <div class="nt-cell dow-cell">
-            <span class="nt-label">Weekday</span>
-            <span class="nt-dow" id="nt-dow-big">FRIDAY</span>
-          </div>
+          <div class="nt-cell month-cell"><span class="nt-month" id="nt-month">May</span></div>
+          <div class="nt-cell day-cell"><span class="nt-day" id="nt-day">02</span></div>
+          <div class="nt-cell time-cell"><span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span></div>
+          <div class="nt-cell dow-cell"><span class="nt-dow" id="nt-dow-big">FRIDAY</span></div>
         </div>
       </div>
 
@@ -1376,7 +1356,7 @@
   // STATE
   // ============================================================
   let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
-  let focusedDayOffset = null; // which day column is colour-revealed, or null
+  let focusedDayOffset = 0; // today always starts highlighted
   // Fri/Sat/Sun → weekend; Mon–Thu → weekdays
   const _startDay = new Date().getDay();
   let viewMode = (_startDay === 5 || _startDay === 6 || _startDay === 0) ? 'weekend' : 'weekdays';
@@ -1392,6 +1372,7 @@
       return [viewDayOffset];
     }
     if (mode === 'weekend') {
+      if (today === 5) return [0, 1]; // Fri: show today + Sat
       let satOffset = (6 - today + 7) % 7;
       if (today === 0) satOffset = -1;
       if (today === 6) satOffset = 0;
@@ -1718,7 +1699,7 @@
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
     document.getElementById('nt-year').textContent = now.getFullYear();
-    document.getElementById('nt-month').textContent = now.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+    document.getElementById('nt-month').textContent = now.toLocaleDateString('en-US', { month: 'long' });
     document.getElementById('nt-day').textContent = pad2(now.getDate());
     document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
