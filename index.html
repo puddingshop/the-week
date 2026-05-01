@@ -212,25 +212,13 @@
     display: none;
   }
   .nt-time-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
   }
   .nt-time {
-    font-size: clamp(72px, 20vw, 120px);
-    font-weight: 200;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
-    line-height: 1;
-    white-space: nowrap;
+    display: none;
   }
   .nt-time .ampm {
-    font-size: 18px;
-    color: var(--mute);
-    margin-left: 8px;
-    font-weight: 400;
-    vertical-align: 0.6em;
+    display: none;
   }
   .nt-bottom {
     display: flex;
@@ -1137,9 +1125,6 @@
 
       <!-- NOW (standby / home) -->
       <div class="view" id="view-now">
-        <div class="nt-time-wrap">
-          <span class="nt-time" id="nt-time-big">11:15<span class="ampm">am</span></span>
-        </div>
         <div class="nt-bottom">
           <div class="nt-weekday" id="nt-weekday">Wednesday</div>
           <div class="nt-date" id="nt-date">2 May</div>
@@ -1822,7 +1807,6 @@
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
     const month = now.toLocaleDateString('en-US', { month: 'long' });
-    document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('nt-weekday').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
     document.getElementById('nt-date').textContent = `${month} ${now.getDate()}`;
     document.getElementById('nt-time-stacked').textContent = `${h12}:${pad2(m)} ${ampm}`;
