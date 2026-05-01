@@ -419,8 +419,10 @@
   .col.show-color .ev.next[data-p="sarah"],   .col.focused-day .ev.next[data-p="sarah"]   { background: var(--sarah);   color: var(--sarah-text); }
   .col.show-color .ev.next[data-p="phoenix"], .col.focused-day .ev.next[data-p="phoenix"] { background: var(--phoenix); color: var(--phoenix-text); }
   .col.show-color .ev.next[data-p="lua"],     .col.focused-day .ev.next[data-p="lua"]     { background: var(--lua);     color: var(--lua-text); }
-  .col.show-color .ev.next[data-p="sarah"] .when,  .col.focused-day .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.8); }
-  .col.show-color .ev.next[data-p="lua"] .when,    .col.focused-day .ev.next[data-p="lua"] .when   { color: rgba(255,255,255,0.8); }
+  .col.show-color .ev.next .when,
+  .col.focused-day .ev.next .when { color: rgba(0,0,0,0.4); }
+  .col.show-color .ev.next[data-p="sarah"] .when,  .col.focused-day .ev.next[data-p="sarah"] .when { color: rgba(255,255,255,0.7); }
+  .col.show-color .ev.next[data-p="lua"] .when,    .col.focused-day .ev.next[data-p="lua"] .when   { color: rgba(255,255,255,0.7); }
 
   .col.show-color .ev.past,
   .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
