@@ -192,126 +192,106 @@
   }
   .view.active { display: flex; }
 
-  /* ============ NOW VIEW (Stendig/Rams) ============ */
+  /* ============ NOW VIEW (Karlsson flip-clock energy) ============ */
   #view-now {
     background: var(--bg);
-    padding: 20px 24px 24px;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0;
-  }
-  .now-meta {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--hair);
-  }
-  .now-dow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
+    padding: 0;
+    flex-direction: column;
+    position: relative;
   }
   .now-close {
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--mute);
-    background: none;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: transparent;
     border: none;
-    padding: 4px 8px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--mute);
+    padding: 6px 10px;
     border-radius: 6px;
-  }
-  .now-close:hover { color: var(--ink); }
-  .now-time-block {
-    flex: 0 0 auto;
-    padding: 36px 0 28px;
-    text-align: center;
-  }
-  .now-time {
-    font-size: 110px;
-    font-weight: 200;
-    letter-spacing: -0.06em;
-    line-height: 0.9;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
-  }
-  .now-time .ampm {
-    font-size: 24px;
-    color: var(--mute);
-    margin-left: 6px;
-    letter-spacing: 0;
-    vertical-align: top;
-    position: relative;
-    top: 18px;
-  }
-  .now-rule {
-    width: 40px;
-    height: 2px;
-    background: var(--accent);
-    margin: 16px auto 16px;
-  }
-  .now-date {
-    font-size: 14px;
-    font-weight: 500;
     letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink);
+    font-weight: 500;
+    font-family: inherit;
   }
-  .now-cards {
-    width: 100%;
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .now-card-label {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.25em;
+  .now-close:hover { color: var(--ink); background: var(--hair); }
+
+  .nt-year-band {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.4em;
     color: var(--mute);
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    font-weight: 600;
+    padding: 18px 0 14px;
+    border-bottom: 1px solid var(--hair);
+    font-variant-numeric: tabular-nums;
   }
-  .now-card {
+
+  .nt-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    grid-template-rows: 1fr 1fr;
+    min-height: 0;
+  }
+  .nt-cell {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 0;
+    justify-content: center;
+    padding: 10px 14px;
+    overflow: hidden;
+  }
+  .nt-cell.month-cell {
+    border-right: 1px solid var(--hair);
     border-bottom: 1px solid var(--hair);
   }
-  .now-card:last-child { border-bottom: none; }
-  .now-card .swatch {
-    width: 4px;
-    height: 22px;
-    border-radius: 2px;
-    flex-shrink: 0;
+  .nt-cell.day-cell {
+    border-bottom: 1px solid var(--hair);
   }
-  .now-card .who {
-    font-size: 10px;
+  .nt-cell.time-cell {
+    border-right: 1px solid var(--hair);
+  }
+  .nt-month {
+    font-size: 38px;
     font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1;
     color: var(--ink);
-    width: 60px;
   }
-  .now-card .what {
-    font-size: 13px;
-    font-weight: 500;
+  .nt-day {
+    font-size: 150px;
+    font-weight: 600;
+    letter-spacing: -0.08em;
+    line-height: 0.85;
     color: var(--ink);
-    flex: 1;
+    font-variant-numeric: tabular-nums;
   }
-  .now-card .when {
+  .nt-time {
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .nt-time .ampm {
     font-size: 11px;
     color: var(--mute);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.05em;
+    margin-left: 4px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+    vertical-align: 0.4em;
   }
-  .now-card.muted .who, .now-card.muted .what { color: var(--mute); }
+  .nt-dow {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
 
   /* ============ CALENDAR GRID ============ */
   .cal {
@@ -1045,16 +1025,15 @@
 
     <div class="content">
 
-      <!-- NOW -->
+      <!-- NOW (standby / home) -->
       <div class="view" id="view-now">
-        <div class="now-meta">
-          <div class="now-dow" id="now-dow">FRIDAY</div>
-          <button class="now-close" id="now-close">CLOSE</button>
-        </div>
-        <div class="now-time-block">
-          <div class="now-time" id="now-time">9:20<span class="ampm" id="now-ampm">am</span></div>
-          <div class="now-rule"></div>
-          <div class="now-date" id="now-date">1 MAY 2026</div>
+        <button class="now-close" id="now-close">×</button>
+        <div class="nt-year-band" id="nt-year">2026</div>
+        <div class="nt-grid">
+          <div class="nt-cell month-cell"><span class="nt-month" id="nt-month">MAY</span></div>
+          <div class="nt-cell day-cell"><span class="nt-day" id="nt-day">01</span></div>
+          <div class="nt-cell time-cell"><span class="nt-time" id="nt-time-big">9:24<span class="ampm">am</span></span></div>
+          <div class="nt-cell dow-cell"><span class="nt-dow" id="nt-dow-big">FRI</span></div>
         </div>
       </div>
 
@@ -1127,7 +1106,7 @@
     </div>
     <div class="tab" data-tab="chores">
       <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10"/></svg>
-      <span>Chores</span>
+      <span>Jobs</span>
     </div>
   </div>
 
@@ -1519,9 +1498,11 @@
     const m = now.getMinutes();
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
-    document.getElementById('now-time').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
-    document.getElementById('now-dow').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-    document.getElementById('now-date').textContent = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+    document.getElementById('nt-year').textContent = now.getFullYear();
+    document.getElementById('nt-month').textContent = now.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+    document.getElementById('nt-day').textContent = pad2(now.getDate());
+    document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
+    document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
   }
 
   // ============================================================
@@ -1542,6 +1523,7 @@
       document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
       t.classList.add('active');
       document.body.dataset.tab = t.dataset.tab;
+      if (t.dataset.tab === 'calendar') setMode('weekdays');
       if (t.dataset.tab === 'chores') renderChores();
       if (t.dataset.tab === 'meals')  renderMeals();
       if (t.dataset.tab === 'shop')   renderShop();
