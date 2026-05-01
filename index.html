@@ -1395,10 +1395,10 @@
   // STATE
   // ============================================================
   let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
-  const wednesdayOffset = ((3 - _startDay) + 7) % 7; // calculate Wednesday's offset (0=Sun, 3=Wed)
-  let focusedDayOffset = wednesdayOffset; // Wednesday always starts highlighted
   // Fri/Sat/Sun → weekend; Mon–Thu → weekdays
   const _startDay = new Date().getDay();
+  const wednesdayOffset = ((3 - _startDay) + 7) % 7; // calculate Wednesday's offset (0=Sun, 3=Wed)
+  let focusedDayOffset = wednesdayOffset; // Wednesday always starts highlighted
   let viewMode = (_startDay === 5 || _startDay === 6 || _startDay === 0) ? 'weekend' : 'weekdays';
   let viewDayOffset = 0;     // when in 'day' mode, which day
   let prevNormalMode = viewMode; // remembers last weekend/weekdays
