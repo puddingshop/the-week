@@ -1395,7 +1395,8 @@
   // STATE
   // ============================================================
   let focusedPerson = null;    // 'jordan', 'sarah', etc, or null
-  let focusedDayOffset = 0; // today always starts highlighted
+  const wednesdayOffset = ((3 - _startDay) + 7) % 7; // calculate Wednesday's offset (0=Sun, 3=Wed)
+  let focusedDayOffset = wednesdayOffset; // Wednesday always starts highlighted
   // Fri/Sat/Sun → weekend; Mon–Thu → weekdays
   const _startDay = new Date().getDay();
   let viewMode = (_startDay === 5 || _startDay === 6 || _startDay === 0) ? 'weekend' : 'weekdays';
@@ -1745,7 +1746,9 @@
     b.addEventListener('click', () => {
       // if currently in day mode, preserve the day selection
       if (viewMode === 'day') {
-        setMode(b.dataset.mode, viewDayOffset);
+        focusedDayOffset = viewDayOffset;
+        document.body.dataset.dayFocus = '';
+        setMode(b.dataset.mode);
       } else {
         setMode(b.dataset.mode);
       }
