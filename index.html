@@ -212,17 +212,20 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
     color: var(--mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
   .nt-time-wrap {
     flex: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   .nt-time {
-    font-size: clamp(88px, 24vw, 152px);
+    font-size: clamp(72px, 20vw, 120px);
     font-weight: 200;
     font-variant-numeric: tabular-nums;
     color: var(--ink);
@@ -230,21 +233,26 @@
     white-space: nowrap;
   }
   .nt-time .ampm {
-    font-size: 11px;
+    font-size: 18px;
     color: var(--mute);
-    margin-left: 6px;
-    font-weight: 700;
-    vertical-align: 0.65em;
+    margin-left: 8px;
+    font-weight: 400;
+    vertical-align: 0.6em;
+  }
+  .nt-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
   .nt-weekday {
-    font-size: clamp(44px, 11vw, 72px);
-    font-weight: 200;
+    font-size: 18px;
+    font-weight: 400;
     color: var(--ink);
     line-height: 1;
   }
   .nt-date {
-    font-size: clamp(44px, 11vw, 72px);
-    font-weight: 800;
+    font-size: 28px;
+    font-weight: 700;
     color: var(--ink);
     line-height: 1;
   }
@@ -1131,8 +1139,10 @@
         <div class="nt-time-wrap">
           <span class="nt-time" id="nt-time-big">11:15<span class="ampm">am</span></span>
         </div>
-        <div class="nt-weekday" id="nt-weekday">Wednesday</div>
-        <div class="nt-date" id="nt-date">2 May</div>
+        <div class="nt-bottom">
+          <div class="nt-weekday" id="nt-weekday">Wednesday</div>
+          <div class="nt-date" id="nt-date">2 May</div>
+        </div>
       </div>
 
       <!-- CALENDAR (single grid that re-renders for any day count) -->
@@ -1753,7 +1763,8 @@
         renderCalendar();
       }
     };
-    if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const shouldUseTransition = document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && viewMode !== 'unset';
+    if (shouldUseTransition) {
       document.startViewTransition(swap);
     } else {
       swap();
@@ -1812,7 +1823,7 @@
     document.getElementById('nt-dow-big').textContent = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
     document.getElementById('nt-time-big').innerHTML = `${h12}:${pad2(m)}<span class="ampm">${ampm}</span>`;
     document.getElementById('nt-weekday').textContent = now.toLocaleDateString('en-US', { weekday: 'long' });
-    document.getElementById('nt-date').textContent = `${now.getDate()} ${month}`;
+    document.getElementById('nt-date').textContent = `${month} ${now.getDate()}`;
   }
 
   // ============================================================
