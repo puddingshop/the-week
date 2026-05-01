@@ -70,10 +70,11 @@
   .topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 18px;
     padding: 16px 18px 10px;
     flex-shrink: 0;
   }
+  .topdate { flex-shrink: 0; }
   .topdate {
     cursor: pointer;
     line-height: 1;
@@ -105,14 +106,15 @@
 
   /* segmented view switcher */
   .seg {
-    display: inline-flex;
+    display: flex;
+    flex: 1;
     background: #ececec;
     padding: 3px;
     border-radius: 10px;
     gap: 1px;
   }
   .seg-btn {
-    width: 38px;
+    flex: 1;
     height: 28px;
     border: none;
     background: transparent;
@@ -1248,6 +1250,11 @@
     <input type="range" id="dev-day" min="0" max="6" step="1" value="4">
     <span class="dev-val" id="dev-day-val">FRI</span>
   </div>
+  <div class="dev-title">MONTH SIM</div>
+  <div class="dev-row">
+    <input type="range" id="dev-month" min="0" max="11" step="1" value="4">
+    <span class="dev-val" id="dev-month-val">May</span>
+  </div>
   <div class="dev-title">PALETTE</div>
   <div class="dev-row dev-presets">
     <button class="dev-pal active" data-pal="bright">Bright</button>
@@ -2342,6 +2349,21 @@
   devDaySlider.value = initSliderVal;
   document.getElementById('dev-day-val').textContent = SIM_DAYS[initSliderVal];
   devDaySlider.addEventListener('input', () => setSimDay(+devDaySlider.value));
+
+  // DEV PANEL — month simulator (shifts fakeNow's month)
+  // ============================================================
+  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthSlider = document.getElementById('dev-month');
+  const monthVal    = document.getElementById('dev-month-val');
+  monthSlider.value = fakeNow.getMonth();
+  monthVal.textContent = MONTH_NAMES[fakeNow.getMonth()];
+  monthSlider.addEventListener('input', () => {
+    const m = +monthSlider.value;
+    monthVal.textContent = MONTH_NAMES[m];
+    fakeNow.setMonth(m);
+    updateTopDate();
+    setMode(viewMode);
+  });
 
   // DEV PANEL — frame size controls
   // ============================================================
