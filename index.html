@@ -685,6 +685,23 @@
     from { transform: translateY(24px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
+  @keyframes marchAnts {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -8px; }
+  }
+  .col.birthday::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid;
+    border-radius: 4px;
+    pointer-events: none;
+    animation: marchAnts 0.6s linear infinite;
+  }
+  .col.birthday[data-birthday-person="jordan"]::before { border-color: var(--jordan); }
+  .col.birthday[data-birthday-person="sarah"]::before { border-color: var(--sarah); }
+  .col.birthday[data-birthday-person="phoenix"]::before { border-color: var(--phoenix); }
+  .col.birthday[data-birthday-person="lua"]::before { border-color: var(--lua); }
   .modal-head {
     display: flex;
     justify-content: space-between;
@@ -1328,6 +1345,15 @@
 
 <script>
   // ============================================================
+  // BIRTHDAYS
+  // ============================================================
+  const birthdays = [
+    { person: 'jordan',  month: 6,  day: 14 },
+    { person: 'lua',     month: 4,  day: 7 },
+    { person: 'phoenix', month: 12, day: 10 },
+    { person: 'sarah',   month: 12, day: 24 },
+  ];
+
   // SAMPLE EVENTS
   // ============================================================
   // dayOffset: 0 = today, +1 = tomorrow, etc.
@@ -1540,8 +1566,12 @@
     offsets.forEach(off => {
       const isToday = off === 0;
       const showColor = isToday || viewMode === 'day' || off === effectiveFocus;
+      const d = new Date(realNow().getTime());
+      d.setDate(d.getDate() + off);
+      const birthdayPerson = birthdays.find(b => b.month === d.getMonth() + 1 && b.day === d.getDate());
       const col = document.createElement('div');
-      col.className = 'col' + (isToday ? ' today' : '') + (showColor ? ' show-color' : '') + (off === effectiveFocus ? ' focused-day' : '');
+      col.className = 'col' + (isToday ? ' today' : '') + (showColor ? ' show-color' : '') + (off === effectiveFocus ? ' focused-day' : '') + (birthdayPerson ? ' birthday' : '');
+      if (birthdayPerson) col.dataset.birthdayPerson = birthdayPerson.person;
       for (let h = START_HOUR; h < END_HOUR; h++) {
         const cell = document.createElement('div');
         cell.className = 'hour-cell';
