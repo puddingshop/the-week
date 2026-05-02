@@ -117,11 +117,21 @@
     flex: 1;
   }
   .topbar-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     font-size: 18px;
     font-weight: 700;
     color: var(--ink);
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
+    gap: 0;
+    line-height: 1;
+  }
+  .topbar-time .meridiem {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
   }
   .seg-btn {
     flex: 1;
@@ -2490,7 +2500,7 @@
     const m = now.getMinutes();
     const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
-    document.getElementById('topbar-time').textContent = `${h12}:${pad2(m)}${ampm}`;
+    document.getElementById('topbar-time').innerHTML = `<div>${h12}:${pad2(m)}</div><div class="meridiem">${ampm}</div>`;
   }
 
   function tick() {
