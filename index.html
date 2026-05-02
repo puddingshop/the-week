@@ -435,12 +435,12 @@
   .col.show-color .ev.past,
   .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
 
-  /* avatar focus */
-  body[data-focus="jordan"] .col:not([data-people*="jordan"]) { display: none; }
-  body[data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
-  body[data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
-  body[data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
-  body[data-focus] .col { grid-column: 1 / -1; }
+  /* avatar focus — collapse other columns only in single-day view */
+  body[data-mode="day"][data-focus="jordan"] .col:not([data-people*="jordan"]) { display: none; }
+  body[data-mode="day"][data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
+  body[data-mode="day"][data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
+  body[data-mode="day"][data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
+  body[data-mode="day"][data-focus] .col { grid-column: 1 / -1; }
   body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
@@ -1653,7 +1653,7 @@
       const dayEvents = events.filter(e => e.d === off);
       const peopleSeen = new Set(dayEvents.map(e => e.p));
       col.dataset.people = Array.from(peopleSeen).join(',');
-      const renderEvents = focusedPerson
+      const renderEvents = (focusedPerson && viewMode === 'day')
         ? dayEvents.filter(e => e.p === focusedPerson)
         : dayEvents;
       const sorted = [...renderEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
