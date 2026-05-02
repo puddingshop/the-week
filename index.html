@@ -127,9 +127,10 @@
     font-variant-numeric: tabular-nums;
     gap: 0;
     line-height: 1;
+    letter-spacing: -0.035em;
   }
   .topbar-time .meridiem {
-    font-size: 11px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -435,7 +436,7 @@
   .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
 
   /* avatar focus */
-  body[data-focus] .col:not([data-people*="jordan"]) { display: none; }
+  body[data-focus="jordan"] .col:not([data-people*="jordan"]) { display: none; }
   body[data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
   body[data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
   body[data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
@@ -975,6 +976,27 @@
     border-radius: 50%;
     background: var(--faint);
   }
+  /* Birthday animation in month view */
+  .mon-cell.birthday::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid;
+    border-radius: 4px;
+    pointer-events: none;
+    animation: marchAnts 0.6s linear infinite;
+  }
+  .mon-cell.birthday[data-birthday-person="jordan"]::after { border-color: var(--jordan); }
+  .mon-cell.birthday[data-birthday-person="sarah"]::after   { border-color: var(--sarah); }
+  .mon-cell.birthday[data-birthday-person="phoenix"]::after { border-color: var(--phoenix); }
+  .mon-cell.birthday[data-birthday-person="lua"]::after     { border-color: var(--lua); }
+  /* Multi-day events bar */
+  .mon-cell .multi-day-bar {
+    height: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    width: 100%;
+  }
 
   /* ============ NOW VIEW visibility ============ */
   body[data-mode="now"] .topbar,
@@ -1432,6 +1454,13 @@
     { p: 'jordan',  t: 'Meal prep',     start: '16:00', end: '17:30', d: 2 },
     { p: 'lua',     t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
     { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
+    // NYC trip (multi-day)
+    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 3, multi: true },
+    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 3, multi: true },
+    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 4, multi: true },
+    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 4, multi: true },
+    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 5, multi: true },
+    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 5, multi: true },
   ];
 
   const START_HOUR = 6;
@@ -2512,14 +2541,29 @@
         const diff = Math.round((cellDate - todayMidnight) / 86400000);
         const isToday = diff === 0;
 
+        // Check for birthday
+        const birthdayPerson = birthdays.find(b => b.month === cellDate.getMonth() + 1 && b.day === cellDate.getDate());
+
+        // Check for multi-day events on this date
+        const multiDayEventsOnDate = events.filter(e => e.multi && Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()).setDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getDate() + e.d) - todayMidnight) / 86400000) === diff);
+        const uniqueMultiDayPeople = [...new Set(multiDayEventsOnDate.map(e => e.p))];
+
         const cell = document.createElement('div');
-        cell.className = 'mon-cell' + (!isThisMonth ? ' out-of-month' : '') + (isToday ? ' today' : '');
+        cell.className = 'mon-cell' + (!isThisMonth ? ' out-of-month' : '') + (isToday ? ' today' : '') + (birthdayPerson ? ' birthday' : '');
+        if (birthdayPerson) cell.dataset.birthdayPerson = birthdayPerson.person;
 
         const numEl = document.createElement('div');
         numEl.className = 'mon-num';
         numEl.textContent = cellDate.getDate();
         cell.appendChild(numEl);
 
+        // Add multi-day event bars
+        uniqueMultiDayPeople.forEach(person => {
+          const bar = document.createElement('div');
+          bar.className = 'multi-day-bar';
+          bar.style.color = `var(--${person})`;
+          cell.appendChild(bar);
+        });
 
         cell.addEventListener('click', () => setMode('day', diff));
         weekEl.appendChild(cell);
