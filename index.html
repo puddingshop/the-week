@@ -91,7 +91,7 @@
   .topdate .dnum {
     font-size: 18px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
   .topdate .month {
@@ -440,7 +440,7 @@
   body[data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
   body[data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
   body[data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
-  body[data-focus] .col { flex: 1 1 auto !important; }
+  body[data-focus] .col { grid-column: 1 / -1; }
   body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
@@ -932,6 +932,7 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    position: relative;
   }
   .mon-week {
     flex: 1;
@@ -991,7 +992,7 @@
   .mon-cell.birthday[data-birthday-person="phoenix"]::after { border-color: var(--phoenix); }
   .mon-cell.birthday[data-birthday-person="lua"]::after     { border-color: var(--lua); }
   /* Multi-day events bar */
-  .mon-event {
+  .mon-event-bar {
     background: #e8e8e8;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
@@ -1003,6 +1004,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 20px;
+    display: flex;
+    align-items: center;
   }
 
   /* ============ NOW VIEW visibility ============ */
@@ -1088,9 +1092,8 @@
   /* ============ DEV PANEL ============ */
   .dev-panel {
     position: fixed;
-    top: 50%;
+    bottom: 18px;
     left: 18px;
-    transform: translateY(-50%);
     max-width: 220px;
     background: rgba(20,20,20,0.78);
     color: rgba(255,255,255,0.9);
@@ -1106,14 +1109,46 @@
     z-index: 100;
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     user-select: none;
-    opacity: 0.08;
-    filter: grayscale(1);
-    transition: opacity 0.4s ease 0.2s, filter 0.4s ease 0.2s;
+    transition: opacity 0.2s ease, filter 0.2s ease, padding 0.2s ease, max-width 0.2s ease;
   }
-  .dev-panel:hover {
-    opacity: 1;
-    filter: grayscale(0);
-    transition: opacity 0.12s ease, filter 0.12s ease;
+  /* Collapsed state — small circular icon */
+  .dev-panel.collapsed {
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    max-width: 28px;
+    border-radius: 50%;
+    overflow: hidden;
+    opacity: 0.25;
+    cursor: pointer;
+  }
+  .dev-panel.collapsed:hover { opacity: 0.9; }
+  .dev-panel.collapsed > *:not(.dev-toggle) { display: none; }
+  .dev-toggle {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    color: rgba(255,255,255,0.7);
+  }
+  .dev-toggle:hover { background: rgba(255,255,255,0.2); color: white; }
+  .dev-panel.collapsed .dev-toggle {
+    position: static;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border-radius: 0;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
   }
   .dev-panel .dev-title {
     font-size: 9px;
@@ -1324,7 +1359,8 @@
 </div>
 
 <!-- ============ DEV PANEL (in grey area) ============ -->
-<div class="dev-panel">
+<div class="dev-panel collapsed">
+  <div class="dev-toggle" id="dev-toggle" title="Toggle dev panel">⋯</div>
   <div class="dev-title">DAY SIM</div>
   <div class="dev-row">
     <input type="range" id="dev-day" min="0" max="6" step="1" value="4">
@@ -1617,7 +1653,10 @@
       const dayEvents = events.filter(e => e.d === off);
       const peopleSeen = new Set(dayEvents.map(e => e.p));
       col.dataset.people = Array.from(peopleSeen).join(',');
-      const sorted = [...dayEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+      const renderEvents = focusedPerson
+        ? dayEvents.filter(e => e.p === focusedPerson)
+        : dayEvents;
+      const sorted = [...renderEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
 
       // Build clusters: contiguous chains of overlapping events.
       // Width is shared only within a cluster; isolated events get full width.
@@ -2462,6 +2501,21 @@
     setMode(viewMode);
   }
 
+  // dev panel collapse/expand
+  const devPanel = document.querySelector('.dev-panel');
+  const devToggle = document.getElementById('dev-toggle');
+  devPanel.addEventListener('click', (e) => {
+    if (devPanel.classList.contains('collapsed')) {
+      devPanel.classList.remove('collapsed');
+      devToggle.textContent = '×';
+    }
+  });
+  devToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    devPanel.classList.toggle('collapsed');
+    devToggle.textContent = devPanel.classList.contains('collapsed') ? '⋯' : '×';
+  });
+
   const devDaySlider = document.getElementById('dev-day');
   const initSliderVal = GETDAY_TO_SLIDER[new Date().getDay()];
   devDaySlider.value = initSliderVal;
@@ -2558,28 +2612,51 @@
         const cell = document.createElement('div');
         cell.className = 'mon-cell' + (!isThisMonth ? ' out-of-month' : '') + (isToday ? ' today' : '') + (birthdayPerson ? ' birthday' : '');
         if (birthdayPerson) cell.dataset.birthdayPerson = birthdayPerson.person;
+        cell.dataset.dayOffset = diff;
 
         const numEl = document.createElement('div');
         numEl.className = 'mon-num';
         numEl.textContent = cellDate.getDate();
         cell.appendChild(numEl);
 
-        // Add multi-day events
-        const multiDayEvents = events.filter(e => e.multi && Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()).setDate(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getDate() + e.d) - todayMidnight) / 86400000) === diff);
-        const uniqueMultiDayEvents = [...new Map(multiDayEvents.map(e => [e.t, e])).values()];
-
-        uniqueMultiDayEvents.forEach(ev => {
-          const eventBox = document.createElement('div');
-          eventBox.className = 'mon-event';
-          eventBox.textContent = ev.t === 'NYC trip' ? 'NYC' : ev.t;
-          cell.appendChild(eventBox);
-        });
-
         cell.addEventListener('click', () => setMode('day', diff));
         weekEl.appendChild(cell);
       }
       root.appendChild(weekEl);
     }
+
+    // Add spanning multi-day event bars
+    const multiDayEventsByTitle = {};
+    events.filter(e => e.multi).forEach(e => {
+      if (!multiDayEventsByTitle[e.t]) multiDayEventsByTitle[e.t] = [];
+      multiDayEventsByTitle[e.t].push(e.d);
+    });
+
+    Object.entries(multiDayEventsByTitle).forEach(([title, dayOffsets]) => {
+      const minDay = Math.min(...dayOffsets);
+      const maxDay = Math.max(...dayOffsets);
+
+      const startCell = document.querySelector(`[data-day-offset="${minDay}"]`);
+      const endCell = document.querySelector(`[data-day-offset="${maxDay}"]`);
+
+      if (startCell && endCell) {
+        const bar = document.createElement('div');
+        bar.className = 'mon-event-bar';
+        bar.textContent = title === 'NYC trip' ? 'NYC' : title;
+
+        const startRect = startCell.getBoundingClientRect();
+        const endRect = endCell.getBoundingClientRect();
+        const containerRect = root.getBoundingClientRect();
+
+        bar.style.position = 'absolute';
+        bar.style.left = (startRect.left - containerRect.left) + 'px';
+        bar.style.top = (startRect.top - containerRect.top + 28) + 'px';
+        bar.style.width = (endRect.right - startRect.left) + 'px';
+        bar.style.pointerEvents = 'none';
+
+        root.appendChild(bar);
+      }
+    });
   }
 
   // ============================================================
