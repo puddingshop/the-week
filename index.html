@@ -435,13 +435,17 @@
   .col.show-color .ev.past,
   .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
 
-  /* avatar focus — collapse other columns only in single-day view */
-  body[data-mode="day"][data-focus="jordan"] .col:not([data-people*="jordan"]) { display: none; }
-  body[data-mode="day"][data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
-  body[data-mode="day"][data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
-  body[data-mode="day"][data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
-  body[data-mode="day"][data-focus] .col { grid-column: 1 / -1; }
+  /* avatar focus — empty days are filtered out in JS, remaining columns share grid evenly */
   body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
+  /* When soloed, apply the focused person's color to all their events across all columns */
+  body[data-focus="jordan"]  .ev.in-focus { border-color: var(--jordan); }
+  body[data-focus="sarah"]   .ev.in-focus { border-color: var(--sarah); }
+  body[data-focus="phoenix"] .ev.in-focus { border-color: var(--phoenix); }
+  body[data-focus="lua"]     .ev.in-focus { border-color: var(--lua); }
+  body[data-focus="jordan"]  .ev.in-focus.next { background: var(--jordan);  color: var(--jordan-text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  body[data-focus="sarah"]   .ev.in-focus.next { background: var(--sarah);   color: var(--sarah-text);  box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  body[data-focus="phoenix"] .ev.in-focus.next { background: var(--phoenix); color: var(--phoenix-text);box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  body[data-focus="lua"]     .ev.in-focus.next { background: var(--lua);     color: var(--lua-text);    box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
     border-color: var(--faint) !important;
@@ -993,18 +997,17 @@
   .mon-cell.birthday[data-birthday-person="lua"]::after     { border-color: var(--lua); }
   /* Multi-day events bar */
   .mon-event-bar {
-    background: #e8e8e8;
-    border: 1px solid #d0d0d0;
+    background: #ebebeb;
+    border: 1.25px solid #d8d8d8;
     border-radius: 4px;
-    padding: 4px 6px;
-    font-size: 10px;
+    padding: 3px 5px;
+    font-size: 9px;
     font-weight: 600;
-    color: #666;
-    letter-spacing: 0.05em;
+    color: #999;
+    letter-spacing: -0.01em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 20px;
     display: flex;
     align-items: center;
   }
@@ -1569,7 +1572,12 @@
   // ============================================================
   function renderCalendar() {
     try {
-    const offsets = offsetsForMode(viewMode);
+    let offsets = offsetsForMode(viewMode);
+    // When soloing, hide days where the focused person has no events
+    if (focusedPerson) {
+      const filtered = offsets.filter(off => events.some(e => e.d === off && e.p === focusedPerson));
+      if (filtered.length) offsets = filtered;
+    }
     const headers = document.getElementById('day-headers');
     const hoursCol = document.getElementById('hours');
     const cols = document.getElementById('columns');
@@ -1653,7 +1661,7 @@
       const dayEvents = events.filter(e => e.d === off);
       const peopleSeen = new Set(dayEvents.map(e => e.p));
       col.dataset.people = Array.from(peopleSeen).join(',');
-      const renderEvents = (focusedPerson && viewMode === 'day')
+      const renderEvents = focusedPerson
         ? dayEvents.filter(e => e.p === focusedPerson)
         : dayEvents;
       const sorted = [...renderEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
