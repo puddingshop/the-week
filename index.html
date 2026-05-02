@@ -435,6 +435,11 @@
   .col.focused-day .ev.past { opacity: 0.15; filter: saturate(0.25); }
 
   /* avatar focus */
+  body[data-focus] .col:not([data-people*="jordan"]) { display: none; }
+  body[data-focus="sarah"] .col:not([data-people*="sarah"]) { display: none; }
+  body[data-focus="phoenix"] .col:not([data-people*="phoenix"]) { display: none; }
+  body[data-focus="lua"] .col:not([data-people*="lua"]) { display: none; }
+  body[data-focus] .col { flex: 1 1 auto !important; }
   body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
@@ -1544,6 +1549,8 @@
       }
       // events for this day
       const dayEvents = events.filter(e => e.d === off);
+      const peopleSeen = new Set(dayEvents.map(e => e.p));
+      col.dataset.people = Array.from(peopleSeen).join(',');
       const sorted = [...dayEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
 
       // Build clusters: contiguous chains of overlapping events.
