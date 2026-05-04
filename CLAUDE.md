@@ -1,4 +1,6 @@
-# The Week — Working Instructions
+# Daze — Working Instructions
+
+(Renamed from "The Week" → "Daze". GitHub repo and GH Pages URL have been updated to `daze`. The local folder is still named `The Week/` — renaming would break the running preview server and pinned paths.)
 
 Read BRIEF.md first for the full design brief (visual references, design system, interaction model).
 
@@ -31,5 +33,5 @@ Jordan (yellow), Sarah (pink), Phoenix (green), Lua (purple). Based in Adelaide,
 ## Dev setup
 - Dev panel: floating glass pill in the grey area outside the frame, with size presets
 - Local server: `python3 -m http.server 8000` (configured in .claude/launch.json)
-- Live: https://puddingshop.github.io/the-week/
-- GitHub: https://github.com/puddingshop/the-week
+- Live: https://puddingshop.github.io/daze/
+- GitHub: https://github.com/puddingshop/daze

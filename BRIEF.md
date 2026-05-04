@@ -1,4 +1,6 @@
-# The Week — Project Brief
+# Daze — Project Brief
+
+(Renamed from "The Week" → "Daze". GitHub repo and GH Pages URL are now `daze`; local folder still uses the old `The Week/` name.)
 
 ## What it is
 A family wall-calendar dashboard. Alternative to Skylight / Hearth ($400+ commercial products). The TV-article concept was the spark; the design has since pulled hard toward Stendig / Karlsson / Dieter Rams territory.
@@ -80,7 +82,7 @@ Modular tiles. Hairline dividers (#efefef). Generous negative space. Whole day a
 The Now view is the "standby" mode — Karlsson tile grid showing year, month, day, time, weekday. Reached by tapping the top-date in Calendar. Calendar tab itself never lands here — it always opens to 5-day weekdays.
 
 ## Dev
-- Live URL: https://puddingshop.github.io/the-week/
-- GitHub: https://github.com/puddingshop/the-week
+- Live URL: https://puddingshop.github.io/daze/
+- GitHub: https://github.com/puddingshop/daze
 - Dev panel: floating glass pill in grey area (idles desaturated, hover to bring back), with frame-size sliders + presets (Phone / iPad / 9:16 / Skylight)
 - Favicon: orange now-line mark on rounded square, doubles as iOS home-screen icon

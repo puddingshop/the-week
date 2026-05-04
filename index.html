@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Week</title>
+<title>Daze</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="favicon.svg">
 <meta name="theme-color" content="#ff5e1f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="The Week">
+<meta name="apple-mobile-web-app-title" content="Daze">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -133,7 +133,18 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 2px;
   }
+  .topbar-time .wx-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    color: var(--ink);
+  }
+  .topbar-time .wx-icon svg { width: 100%; height: 100%; display: block; }
   .seg-btn {
     flex: 1;
     height: 28px;
@@ -437,15 +448,28 @@
 
   /* avatar focus — empty days are filtered out in JS, remaining columns share grid evenly */
   body[data-focus] .ev.in-focus { filter: none; opacity: 1; }
-  /* When soloed, apply the focused person's color to all their events across all columns */
-  body[data-focus="jordan"]  .ev.in-focus { border-color: var(--jordan); }
-  body[data-focus="sarah"]   .ev.in-focus { border-color: var(--sarah); }
-  body[data-focus="phoenix"] .ev.in-focus { border-color: var(--phoenix); }
-  body[data-focus="lua"]     .ev.in-focus { border-color: var(--lua); }
-  body[data-focus="jordan"]  .ev.in-focus.next { background: var(--jordan);  color: var(--jordan-text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-  body[data-focus="sarah"]   .ev.in-focus.next { background: var(--sarah);   color: var(--sarah-text);  box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-  body[data-focus="phoenix"] .ev.in-focus.next { background: var(--phoenix); color: var(--phoenix-text);box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-  body[data-focus="lua"]     .ev.in-focus.next { background: var(--lua);     color: var(--lua-text);    box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  /* SOLO MODE: paint focused person's events in their accent.
+     Non-today columns get a lighter tint; today (and tap-focused day) goes full saturation. */
+  body[data-focus="jordan"]  .ev.in-focus { background: color-mix(in srgb, var(--jordan)  22%, white); color: var(--ink); border-color: var(--jordan); }
+  body[data-focus="sarah"]   .ev.in-focus { background: color-mix(in srgb, var(--sarah)   22%, white); color: var(--ink); border-color: var(--sarah); }
+  body[data-focus="phoenix"] .ev.in-focus { background: color-mix(in srgb, var(--phoenix) 22%, white); color: var(--ink); border-color: var(--phoenix); }
+  body[data-focus="lua"]     .ev.in-focus { background: color-mix(in srgb, var(--lua)     22%, white); color: var(--ink); border-color: var(--lua); }
+  body[data-focus="jordan"]  .col.show-color .ev.in-focus,
+  body[data-focus="jordan"]  .col.focused-day .ev.in-focus { background: var(--jordan);  color: var(--jordan-text); }
+  body[data-focus="sarah"]   .col.show-color .ev.in-focus,
+  body[data-focus="sarah"]   .col.focused-day .ev.in-focus { background: var(--sarah);   color: var(--sarah-text); }
+  body[data-focus="phoenix"] .col.show-color .ev.in-focus,
+  body[data-focus="phoenix"] .col.focused-day .ev.in-focus { background: var(--phoenix); color: var(--phoenix-text); }
+  body[data-focus="lua"]     .col.show-color .ev.in-focus,
+  body[data-focus="lua"]     .col.focused-day .ev.in-focus { background: var(--lua);     color: var(--lua-text); }
+  /* .when text adapts to background */
+  body[data-focus] .ev.in-focus .when { color: var(--mute); }
+  body[data-focus] .col.show-color .ev.in-focus .when,
+  body[data-focus] .col.focused-day .ev.in-focus .when { color: rgba(0,0,0,0.4); }
+  body[data-focus="sarah"] .col.show-color .ev.in-focus .when,
+  body[data-focus="sarah"] .col.focused-day .ev.in-focus .when,
+  body[data-focus="lua"]   .col.show-color .ev.in-focus .when,
+  body[data-focus="lua"]   .col.focused-day .ev.in-focus .when { color: rgba(255,255,255,0.7); }
   body[data-focus] .ev:not(.in-focus) {
     opacity: 0.08;
     border-color: var(--faint) !important;
@@ -967,6 +991,8 @@
     line-height: 1;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 1;
   }
   .mon-cell.out-of-month .mon-num { color: var(--faint); }
   .mon-cell.today .mon-num { color: var(--accent); }
@@ -1000,7 +1026,7 @@
     background: #ebebeb;
     border: 1.25px solid #d8d8d8;
     border-radius: 4px;
-    padding: 3px 5px;
+    padding: 4px 6px;
     font-size: 9px;
     font-weight: 600;
     color: #999;
@@ -1008,9 +1034,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
   }
+  .mon-event-bar[data-p="jordan"]  { border-color: var(--jordan); }
+  .mon-event-bar[data-p="sarah"]   { border-color: var(--sarah); }
+  .mon-event-bar[data-p="phoenix"] { border-color: var(--phoenix); }
+  .mon-event-bar[data-p="lua"]     { border-color: var(--lua); }
 
   /* ============ NOW VIEW visibility ============ */
   body[data-mode="now"] .topbar,
@@ -1364,16 +1392,6 @@
 <!-- ============ DEV PANEL (in grey area) ============ -->
 <div class="dev-panel collapsed">
   <div class="dev-toggle" id="dev-toggle" title="Toggle dev panel">⋯</div>
-  <div class="dev-title">DAY SIM</div>
-  <div class="dev-row">
-    <input type="range" id="dev-day" min="0" max="6" step="1" value="4">
-    <span class="dev-val" id="dev-day-val">FRI</span>
-  </div>
-  <div class="dev-title">MONTH SIM</div>
-  <div class="dev-row">
-    <input type="range" id="dev-month" min="0" max="11" step="1" value="4">
-    <span class="dev-val" id="dev-month-val">May</span>
-  </div>
   <div class="dev-title">PALETTE</div>
   <div class="dev-row dev-presets">
     <button class="dev-pal" data-pal="bright">Bright</button>
@@ -1422,92 +1440,101 @@
     { person: 'sarah',   month: 12, day: 24 },
   ];
 
-  // SAMPLE EVENTS
+  // EVENTS — real-world model
   // ============================================================
-  // dayOffset: 0 = today, +1 = tomorrow, etc.
-  const events = [
-    // monday (d=-4)
-    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: -4 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -4 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -4 },
-    { p: 'jordan',  t: 'Team meeting',  start: '09:30', end: '10:30', d: -4 },
-    { p: 'sarah',   t: 'Client work',   start: '10:00', end: '12:30', d: -4 },
-    { p: 'jordan',  t: 'Deep work',     start: '11:00', end: '13:00', d: -4 },
-    { p: 'lua',     t: 'Dance',         start: '15:30', end: '16:30', d: -4 },
-    { p: 'phoenix', t: 'Soccer',        start: '16:00', end: '17:30', d: -4 },
-    { p: 'sarah',   t: 'Grocery run',   start: '16:00', end: '17:00', d: -4 },
-    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: -4 },
-    // tuesday (d=-3)
-    { p: 'sarah',   t: 'PT session',    start: '07:30', end: '08:30', d: -3 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -3 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -3 },
-    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: -3 },
-    { p: 'jordan',  t: 'Design review', start: '10:00', end: '11:30', d: -3 },
-    { p: 'sarah',   t: 'Dentist',       start: '11:00', end: '12:00', d: -3 },
-    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: -3 },
-    { p: 'lua',     t: 'Art class',     start: '15:30', end: '16:30', d: -3 },
-    { p: 'phoenix', t: 'Tutor',         start: '15:30', end: '17:00', d: -3 },
-    { p: 'sarah',   t: 'Book club',     start: '19:00', end: '21:00', d: -3 },
-    // wednesday (d=-2)
-    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: -2 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -2 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -2 },
-    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: -2 },
-    { p: 'jordan',  t: 'Sprint review', start: '10:00', end: '11:00', d: -2 },
-    { p: 'sarah',   t: 'Lunch w/ Mum',  start: '12:00', end: '13:30', d: -2 },
-    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: -2 },
-    { p: 'phoenix', t: 'Art class',     start: '15:30', end: '17:00', d: -2 },
-    { p: 'lua',     t: 'Story time',    start: '17:00', end: '18:00', d: -2 },
-    { p: 'jordan',  t: 'Gym',           start: '17:30', end: '18:30', d: -2 },
-    // thursday (d=-1)
-    { p: 'sarah',   t: 'PT session',    start: '08:00', end: '09:00', d: -1 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: -1 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: -1 },
-    { p: 'jordan',  t: 'Deep work',     start: '09:00', end: '12:00', d: -1 },
-    { p: 'sarah',   t: 'Client call',   start: '10:00', end: '11:00', d: -1 },
-    { p: 'jordan',  t: 'Product review',start: '14:00', end: '15:00', d: -1 },
-    { p: 'lua',     t: 'Swimming',      start: '16:00', end: '17:00', d: -1 },
-    { p: 'phoenix', t: 'Scouts',        start: '17:00', end: '18:30', d: -1 },
-    { p: 'sarah',   t: 'Date night',    start: '19:30', end: '22:00', d: -1 },
-    { p: 'jordan',  t: 'Date night',    start: '19:30', end: '22:00', d: -1 },
-    // friday — today (d=0)
-    { p: 'sarah',   t: 'Yoga',          start: '07:00', end: '08:00', d: 0 },
-    { p: 'jordan',  t: 'Standup',       start: '09:00', end: '09:30', d: 0 },
-    { p: 'phoenix', t: 'School',        start: '09:00', end: '15:00', d: 0 },
-    { p: 'lua',     t: 'School',        start: '09:00', end: '15:00', d: 0 },
-    { p: 'jordan',  t: 'Design rev',    start: '10:30', end: '11:30', d: 0 },
-    { p: 'sarah',   t: 'Client call',   start: '11:00', end: '12:00', d: 0 },
-    { p: 'jordan',  t: 'Lunch',         start: '12:30', end: '13:30', d: 0 },
-    { p: 'sarah',   t: 'Pilates',       start: '14:00', end: '15:00', d: 0 },
-    { p: 'phoenix', t: 'Soccer',        start: '16:00', end: '17:00', d: 0 },
-    { p: 'lua',     t: 'Piano',         start: '16:30', end: '17:15', d: 0 },
-    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: 0 },
-    // saturday (d=1)
-    { p: 'jordan',  t: 'Run',           start: '07:30', end: '08:30', d: 1 },
-    { p: 'sarah',   t: 'Brunch',        start: '10:00', end: '12:00', d: 1 },
-    { p: 'lua',     t: 'Park',          start: '10:00', end: '12:00', d: 1 },
-    { p: 'phoenix', t: 'Soccer game',   start: '10:30', end: '12:00', d: 1 },
-    { p: 'jordan',  t: 'Groceries',     start: '12:30', end: '13:30', d: 1 },
-    { p: 'phoenix', t: 'Birthday party',start: '14:00', end: '17:00', d: 1 },
-    { p: 'sarah',   t: 'Gym',           start: '14:30', end: '15:30', d: 1 },
-    { p: 'jordan',  t: 'Family BBQ',    start: '17:30', end: '20:00', d: 1 },
-    { p: 'sarah',   t: 'Family BBQ',    start: '17:30', end: '20:00', d: 1 },
-    // sunday (d=2)
-    { p: 'sarah',   t: 'Hike',          start: '08:00', end: '11:00', d: 2 },
-    { p: 'lua',     t: 'Swim lesson',   start: '09:00', end: '10:00', d: 2 },
-    { p: 'jordan',  t: 'Coffee',        start: '09:30', end: '10:30', d: 2 },
-    { p: 'phoenix', t: 'Family walk',   start: '15:00', end: '16:30', d: 2 },
-    { p: 'jordan',  t: 'Meal prep',     start: '16:00', end: '17:30', d: 2 },
-    { p: 'lua',     t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
-    { p: 'jordan',  t: 'Family dinner', start: '18:00', end: '19:00', d: 2 },
-    // NYC trip (multi-day)
-    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 3, multi: true },
-    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 3, multi: true },
-    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 4, multi: true },
-    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 4, multi: true },
-    { p: 'jordan',  t: 'NYC trip',      start: '00:00', end: '23:59', d: 5, multi: true },
-    { p: 'sarah',   t: 'NYC trip',      start: '00:00', end: '23:59', d: 5, multi: true },
+  // Recurring events repeat weekly on the listed days of week.
+  // dow values: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const recurringEvents = [
+    // Kids — school weekdays
+    { p: 'phoenix', t: 'School',         start: '09:00', end: '15:00', dow: [1,2,3,4,5] },
+    { p: 'lua',     t: 'School',         start: '09:00', end: '15:00', dow: [1,2,3,4,5] },
+    // Jordan — work routines
+    { p: 'jordan',  t: 'Standup',        start: '09:00', end: '09:30', dow: [1,2,3,4,5] },
+    { p: 'jordan',  t: 'Lunch',          start: '12:30', end: '13:30', dow: [1,2,3,4,5] },
+    { p: 'jordan',  t: 'Deep work',      start: '11:00', end: '13:00', dow: [1] },
+    { p: 'jordan',  t: 'Design review',  start: '10:00', end: '11:30', dow: [2] },
+    { p: 'jordan',  t: 'Sprint review',  start: '10:00', end: '11:00', dow: [3] },
+    { p: 'jordan',  t: 'Product review', start: '14:00', end: '15:00', dow: [4] },
+    { p: 'jordan',  t: 'Gym',            start: '17:30', end: '18:30', dow: [3] },
+    // Sarah — work + fitness
+    { p: 'sarah',   t: 'Yoga',           start: '07:00', end: '08:00', dow: [1,3,5] },
+    { p: 'sarah',   t: 'PT session',     start: '07:30', end: '08:30', dow: [2,4] },
+    { p: 'sarah',   t: 'Pilates',        start: '14:00', end: '15:00', dow: [5] },
+    { p: 'sarah',   t: 'Book club',      start: '19:00', end: '21:00', dow: [2] },
+    // Phoenix — after school
+    { p: 'phoenix', t: 'Tutor',          start: '15:30', end: '17:00', dow: [2] },
+    { p: 'phoenix', t: 'Art class',      start: '15:30', end: '17:00', dow: [3] },
+    { p: 'phoenix', t: 'Soccer',         start: '16:00', end: '17:30', dow: [1,4] },
+    { p: 'phoenix', t: 'Scouts',         start: '17:00', end: '18:30', dow: [4] },
+    // Lua — after school
+    { p: 'lua',     t: 'Dance',          start: '15:30', end: '16:30', dow: [1] },
+    { p: 'lua',     t: 'Art class',      start: '15:30', end: '16:30', dow: [2] },
+    { p: 'lua',     t: 'Story time',     start: '17:00', end: '18:00', dow: [3] },
+    { p: 'lua',     t: 'Swimming',       start: '16:00', end: '17:00', dow: [4] },
+    { p: 'lua',     t: 'Piano',          start: '16:30', end: '17:15', dow: [5] },
+    // Family — weekends
+    { p: 'jordan',  t: 'Family dinner',  start: '18:00', end: '19:00', dow: [0,5] },
+    { p: 'lua',     t: 'Family dinner',  start: '18:00', end: '19:00', dow: [0] },
+    // Saturday
+    { p: 'jordan',  t: 'Run',            start: '07:30', end: '08:30', dow: [6] },
+    { p: 'sarah',   t: 'Brunch',         start: '10:00', end: '12:00', dow: [6] },
+    { p: 'phoenix', t: 'Soccer game',    start: '10:30', end: '12:00', dow: [6] },
+    { p: 'lua',     t: 'Park',           start: '10:00', end: '12:00', dow: [6] },
+    // Sunday
+    { p: 'sarah',   t: 'Hike',           start: '08:00', end: '11:00', dow: [0] },
+    { p: 'lua',     t: 'Swim lesson',    start: '09:00', end: '10:00', dow: [0] },
+    { p: 'jordan',  t: 'Coffee',         start: '09:30', end: '10:30', dow: [0] },
+    { p: 'jordan',  t: 'Meal prep',      start: '16:00', end: '17:30', dow: [0] },
   ];
+
+  // One-off events anchored to specific dates (YYYY-MM-DD, local time).
+  // Use endDate for multi-day spans; multi: true makes it render as a span bar in month view.
+  const oneOffEvents = [
+    // Sarah's NYC trip
+    { p: 'sarah',  t: 'NYC trip',   start: '00:00', end: '23:59', startDate: '2026-05-06', endDate: '2026-05-08', multi: true },
+    // Date night
+    { p: 'jordan', t: 'Date night', start: '19:30', end: '22:00', startDate: '2026-05-09' },
+    { p: 'sarah',  t: 'Date night', start: '19:30', end: '22:00', startDate: '2026-05-09' },
+    // Appointments / one-offs
+    { p: 'sarah',   t: 'Dentist',        start: '11:00', end: '12:00', startDate: '2026-05-12' },
+    { p: 'phoenix', t: 'Birthday party', start: '14:00', end: '17:00', startDate: '2026-05-16' },
+    { p: 'sarah',   t: 'Lunch w/ Mum',   start: '12:00', end: '13:30', startDate: '2026-05-13' },
+  ];
+
+  // Expand recurring + one-off events into a flat array of dated instances.
+  // Each instance gets a `d` field = day offset from today, so existing render
+  // code keeps working unchanged.
+  function parseLocalDate(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const events = (function expandEvents() {
+    const out = [];
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const RANGE_BACK = 14;
+    const RANGE_FORWARD = 60;
+    for (let offset = -RANGE_BACK; offset <= RANGE_FORWARD; offset++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + offset);
+      const dow = date.getDay();
+      recurringEvents.forEach(re => {
+        if (re.dow.includes(dow)) {
+          const { dow: _omit, ...rest } = re;
+          out.push({ ...rest, d: offset });
+        }
+      });
+    }
+    oneOffEvents.forEach(oe => {
+      const start = parseLocalDate(oe.startDate);
+      const end = oe.endDate ? parseLocalDate(oe.endDate) : start;
+      for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+        const offset = Math.round((dt - today) / 86400000);
+        const { startDate: _s, endDate: _e, ...rest } = oe;
+        out.push({ ...rest, d: offset });
+      }
+    });
+    return out;
+  })();
 
   const START_HOUR = 6;
   const END_HOUR = 22;
@@ -1525,9 +1552,7 @@
   }
   function pad2(n){ return String(n).padStart(2,'0'); }
 
-  let fakeNow = new Date();
-  fakeNow.setHours(11, 15, 0, 0);
-  function realNow() { return fakeNow; }
+  function realNow() { return new Date(); }
 
   // ============================================================
   // STATE
@@ -1572,12 +1597,7 @@
   // ============================================================
   function renderCalendar() {
     try {
-    let offsets = offsetsForMode(viewMode);
-    // When soloing, hide days where the focused person has no events
-    if (focusedPerson) {
-      const filtered = offsets.filter(off => events.some(e => e.d === off && e.p === focusedPerson));
-      if (filtered.length) offsets = filtered;
-    }
+    const offsets = offsetsForMode(viewMode);
     const headers = document.getElementById('day-headers');
     const hoursCol = document.getElementById('hours');
     const cols = document.getElementById('columns');
@@ -1657,54 +1677,58 @@
         cell.className = 'hour-cell';
         col.appendChild(cell);
       }
-      // events for this day
-      const dayEvents = events.filter(e => e.d === off);
+      // events for this day — when soloing, drop everyone else entirely
+      let dayEvents = events.filter(e => e.d === off);
+      if (focusedPerson) dayEvents = dayEvents.filter(e => e.p === focusedPerson);
       const peopleSeen = new Set(dayEvents.map(e => e.p));
       col.dataset.people = Array.from(peopleSeen).join(',');
-      const renderEvents = focusedPerson
-        ? dayEvents.filter(e => e.p === focusedPerson)
-        : dayEvents;
-      const sorted = [...renderEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+      const sorted = [...dayEvents].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
 
       // Build clusters: contiguous chains of overlapping events.
       // Width is shared only within a cluster; isolated events get full width.
-      const clusters = [];
-      let cur = [];
-      let curEnd = -1;
-      sorted.forEach(ev => {
-        const s = timeToMinutes(ev.start);
-        const e = timeToMinutes(ev.end);
-        if (s >= curEnd) {
-          if (cur.length) clusters.push(cur);
-          cur = [ev];
-          curEnd = e;
-        } else {
-          cur.push(ev);
-          curEnd = Math.max(curEnd, e);
-        }
-      });
-      if (cur.length) clusters.push(cur);
-
       const personOrder = ['jordan','sarah','phoenix','lua'];
-      clusters.forEach(cluster => {
-        cluster.sort((a, b) => personOrder.indexOf(a.p) - personOrder.indexOf(b.p));
-        const lanes = [];
-        cluster.forEach(ev => {
+      const assignLanes = (eventList) => {
+        const clusters = [];
+        let cur = [];
+        let curEnd = -1;
+        eventList.forEach(ev => {
           const s = timeToMinutes(ev.start);
           const e = timeToMinutes(ev.end);
-          let placed = false;
-          for (let i = 0; i < lanes.length; i++) {
-            if (lanes[i] <= s) { ev._lane = i; lanes[i] = e; placed = true; break; }
+          if (s >= curEnd) {
+            if (cur.length) clusters.push(cur);
+            cur = [ev];
+            curEnd = e;
+          } else {
+            cur.push(ev);
+            curEnd = Math.max(curEnd, e);
           }
-          if (!placed) { ev._lane = lanes.length; lanes.push(e); }
         });
-        const clusterLanes = Math.max(lanes.length, 1);
-        cluster.forEach(ev => { ev._totalLanes = clusterLanes; });
-      });
+        if (cur.length) clusters.push(cur);
+        clusters.forEach(cluster => {
+          cluster.sort((a, b) => personOrder.indexOf(a.p) - personOrder.indexOf(b.p));
+          const lanes = [];
+          cluster.forEach(ev => {
+            const s = timeToMinutes(ev.start);
+            const e = timeToMinutes(ev.end);
+            let placed = false;
+            for (let i = 0; i < lanes.length; i++) {
+              if (lanes[i] <= s) { ev._lane = i; lanes[i] = e; placed = true; break; }
+            }
+            if (!placed) { ev._lane = lanes.length; lanes.push(e); }
+          });
+          const clusterLanes = Math.max(lanes.length, 1);
+          cluster.forEach(ev => { ev._totalLanes = clusterLanes; });
+        });
+      };
+
+      assignLanes(sorted);
 
       sorted.forEach(ev => {
-        const sMin = timeToMinutes(ev.start) - START_HOUR * 60;
-        const eMin = timeToMinutes(ev.end) - START_HOUR * 60;
+        const rawSMin = timeToMinutes(ev.start) - START_HOUR * 60;
+        const rawEMin = timeToMinutes(ev.end) - START_HOUR * 60;
+        // Clamp multi-day / all-day events to the visible grid so they sit flush at top + bottom
+        const sMin = Math.max(rawSMin, 0);
+        const eMin = Math.min(rawEMin, TOTAL_HOURS * 60);
         const topPct = (sMin / (TOTAL_HOURS * 60)) * 100;
         const heightPct = ((eMin - sMin) / (TOTAL_HOURS * 60)) * 100;
         const widthPct = 100 / ev._totalLanes;
@@ -2486,29 +2510,6 @@
     b.addEventListener('click', () => applyPalette(b.dataset.pal))
   );
 
-  // DEV PANEL — day simulator
-  // ============================================================
-  const SIM_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  // slider 0=Mon..6=Sun → getDay() 1=Mon..0=Sun
-  const SLIDER_TO_GETDAY = [1,2,3,4,5,6,0];
-  const GETDAY_TO_SLIDER = [6,0,1,2,3,4,5]; // getDay(0=Sun)→6, getDay(1=Mon)→0, etc.
-
-  function setSimDay(sliderVal) {
-    const targetGetDay = SLIDER_TO_GETDAY[sliderVal];
-    const realToday = new Date();
-    const diff = targetGetDay - realToday.getDay();
-    fakeNow = new Date(realToday);
-    fakeNow.setDate(fakeNow.getDate() + diff);
-    fakeNow.setHours(11, 15, 0, 0);
-    document.getElementById('dev-day-val').textContent = SIM_DAYS[sliderVal];
-    const newDay = fakeNow.getDay();
-    viewMode = (newDay === 5 || newDay === 6 || newDay === 0) ? 'weekend' : 'weekdays';
-    prevNormalMode = viewMode;
-    focusedDayOffset = 0;
-    updateTopDate();
-    setMode(viewMode);
-  }
-
   // dev panel collapse/expand
   const devPanel = document.querySelector('.dev-panel');
   const devToggle = document.getElementById('dev-toggle');
@@ -2522,27 +2523,6 @@
     e.stopPropagation();
     devPanel.classList.toggle('collapsed');
     devToggle.textContent = devPanel.classList.contains('collapsed') ? '⋯' : '×';
-  });
-
-  const devDaySlider = document.getElementById('dev-day');
-  const initSliderVal = GETDAY_TO_SLIDER[new Date().getDay()];
-  devDaySlider.value = initSliderVal;
-  document.getElementById('dev-day-val').textContent = SIM_DAYS[initSliderVal];
-  devDaySlider.addEventListener('input', () => setSimDay(+devDaySlider.value));
-
-  // DEV PANEL — month simulator (shifts fakeNow's month)
-  // ============================================================
-  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const monthSlider = document.getElementById('dev-month');
-  const monthVal    = document.getElementById('dev-month-val');
-  monthSlider.value = fakeNow.getMonth();
-  monthVal.textContent = MONTH_NAMES[fakeNow.getMonth()];
-  monthSlider.addEventListener('input', () => {
-    const m = +monthSlider.value;
-    monthVal.textContent = MONTH_NAMES[m];
-    fakeNow.setMonth(m);
-    updateTopDate();
-    setMode(viewMode);
   });
 
   // DEV PANEL — frame size controls
@@ -2636,13 +2616,14 @@
     // Add spanning multi-day event bars
     const multiDayEventsByTitle = {};
     events.filter(e => e.multi).forEach(e => {
-      if (!multiDayEventsByTitle[e.t]) multiDayEventsByTitle[e.t] = [];
-      multiDayEventsByTitle[e.t].push(e.d);
+      if (!multiDayEventsByTitle[e.t]) multiDayEventsByTitle[e.t] = { days: [], people: [] };
+      multiDayEventsByTitle[e.t].days.push(e.d);
+      if (!multiDayEventsByTitle[e.t].people.includes(e.p)) multiDayEventsByTitle[e.t].people.push(e.p);
     });
 
-    Object.entries(multiDayEventsByTitle).forEach(([title, dayOffsets]) => {
-      const minDay = Math.min(...dayOffsets);
-      const maxDay = Math.max(...dayOffsets);
+    Object.entries(multiDayEventsByTitle).forEach(([title, info]) => {
+      const minDay = Math.min(...info.days);
+      const maxDay = Math.max(...info.days);
 
       const startCell = document.querySelector(`[data-day-offset="${minDay}"]`);
       const endCell = document.querySelector(`[data-day-offset="${maxDay}"]`);
@@ -2650,16 +2631,20 @@
       if (startCell && endCell) {
         const bar = document.createElement('div');
         bar.className = 'mon-event-bar';
+        bar.dataset.p = info.people[0];
         bar.textContent = title === 'NYC trip' ? 'NYC' : title;
 
         const startRect = startCell.getBoundingClientRect();
         const endRect = endCell.getBoundingClientRect();
         const containerRect = root.getBoundingClientRect();
 
+        const PAD = 1;
+        const CELL_BORDER = 1; // .mon-cell has border-right: 1px
         bar.style.position = 'absolute';
-        bar.style.left = (startRect.left - containerRect.left) + 'px';
-        bar.style.top = (startRect.top - containerRect.top + 28) + 'px';
-        bar.style.width = (endRect.right - startRect.left) + 'px';
+        bar.style.left = (startRect.left - containerRect.left + PAD) + 'px';
+        bar.style.top = (startRect.top - containerRect.top + PAD) + 'px';
+        bar.style.width = (endRect.right - startRect.left - PAD * 2 - CELL_BORDER) + 'px';
+        bar.style.height = (startRect.height - PAD * 2) + 'px';
         bar.style.pointerEvents = 'none';
 
         root.appendChild(bar);
@@ -2670,14 +2655,65 @@
   // ============================================================
   // INIT + INTERVALS
   // ============================================================
+  // SF-Symbols-inspired weather icons (filled, monochrome, weight-matched to bold text)
+  const WX_ICONS = {
+    sun: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/><g><rect x="11" y="1.5" width="2" height="3.2" rx="1"/><rect x="11" y="19.3" width="2" height="3.2" rx="1"/><rect x="1.5" y="11" width="3.2" height="2" rx="1"/><rect x="19.3" y="11" width="3.2" height="2" rx="1"/><rect x="11" y="1.5" width="2" height="3.2" rx="1" transform="rotate(45 12 12)"/><rect x="11" y="19.3" width="2" height="3.2" rx="1" transform="rotate(45 12 12)"/><rect x="11" y="1.5" width="2" height="3.2" rx="1" transform="rotate(-45 12 12)"/><rect x="11" y="19.3" width="2" height="3.2" rx="1" transform="rotate(-45 12 12)"/></g></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
+    cloud: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 19h10.5a4.5 4.5 0 0 0 .6-8.96 6 6 0 0 0-11.6-1.27A4.5 4.5 0 0 0 7 19z"/></svg>',
+    cloudSun: '<svg viewBox="0 0 24 24" fill="currentColor"><g><circle cx="17" cy="7" r="2.5"/><rect x="16.25" y="1.5" width="1.5" height="2.5" rx="0.75"/><rect x="16.25" y="10.2" width="1.5" height="2.5" rx="0.75"/><rect x="11" y="6.25" width="2.5" height="1.5" rx="0.75"/><rect x="20.5" y="6.25" width="2.5" height="1.5" rx="0.75"/><rect x="16.25" y="1.5" width="1.5" height="2.5" rx="0.75" transform="rotate(45 17 7)"/><rect x="16.25" y="10.2" width="1.5" height="2.5" rx="0.75" transform="rotate(45 17 7)"/></g><path d="M5 20h10a4 4 0 0 0 .5-7.97 5 5 0 0 0-9.78-1.06A4 4 0 0 0 5 20z"/></svg>',
+    rain: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 16h11a4 4 0 0 0 .5-7.97 5 5 0 0 0-9.78-1.06A4 4 0 0 0 6 16z"/><g><rect x="7.5" y="17.5" width="1.6" height="4.5" rx="0.8" transform="rotate(15 8.3 19.7)"/><rect x="11.2" y="17.5" width="1.6" height="4.5" rx="0.8" transform="rotate(15 12 19.7)"/><rect x="14.9" y="17.5" width="1.6" height="4.5" rx="0.8" transform="rotate(15 15.7 19.7)"/></g></svg>',
+    snow: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 16h11a4 4 0 0 0 .5-7.97 5 5 0 0 0-9.78-1.06A4 4 0 0 0 6 16z"/><g><circle cx="8.3" cy="20" r="1.2"/><circle cx="12" cy="20" r="1.2"/><circle cx="15.7" cy="20" r="1.2"/></g></svg>',
+    fog: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 15h11a4 4 0 0 0 .5-7.97 5 5 0 0 0-9.78-1.06A4 4 0 0 0 6 15z"/><g><rect x="3" y="17.5" width="18" height="1.6" rx="0.8"/><rect x="5" y="20.5" width="14" height="1.6" rx="0.8"/></g></svg>',
+    bolt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 16h11a4 4 0 0 0 .5-7.97 5 5 0 0 0-9.78-1.06A4 4 0 0 0 6 16z"/><path d="M12.5 16l-3.5 5h2.7l-1 3 4-5h-2.7l1.5-3z"/></svg>',
+    wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h7"/></svg>',
+  };
+
+  // Map Open-Meteo WMO weather code → icon key. isDay toggles sun/moon for clear.
+  function wxCodeToIcon(code, isDay, windKmh) {
+    if (code == null) return null;
+    if ([0, 1].includes(code)) {
+      if (windKmh != null && windKmh >= 30) return 'wind';
+      return isDay ? 'sun' : 'moon';
+    }
+    if (code === 2) return 'cloudSun';
+    if (code === 3) return 'cloud';
+    if ([45, 48].includes(code)) return 'fog';
+    if (code >= 51 && code <= 67) return 'rain';
+    if (code >= 80 && code <= 82) return 'rain';
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+    if (code >= 95) return 'bolt';
+    return 'cloud';
+  }
+
+  let currentTempC = null;
+  let currentWxIcon = null;
   function updateTopBarTime() {
     const now = realNow();
     const h = now.getHours();
     const m = now.getMinutes();
-    const ampm = h < 12 ? 'am' : 'pm';
     const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
-    document.getElementById('topbar-time').innerHTML = `<div>${h12}:${pad2(m)}</div><div class="meridiem">${ampm}</div>`;
+    const tempStr = currentTempC == null ? '—' : `${Math.round(currentTempC)}°`;
+    const iconHtml = currentWxIcon && WX_ICONS[currentWxIcon] ? `<span class="wx-icon">${WX_ICONS[currentWxIcon]}</span>` : '';
+    document.getElementById('topbar-time').innerHTML = `<div>${h12}:${pad2(m)}</div><div class="meridiem"><span>${tempStr}</span>${iconHtml}</div>`;
   }
+
+  // Live weather for Adelaide via Open-Meteo (no API key)
+  async function fetchWeather() {
+    try {
+      const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.9285&longitude=138.6007&current=temperature_2m,weather_code,wind_speed_10m,is_day&temperature_unit=celsius&wind_speed_unit=kmh');
+      const data = await r.json();
+      if (data && data.current && typeof data.current.temperature_2m === 'number') {
+        currentTempC = data.current.temperature_2m;
+        currentWxIcon = wxCodeToIcon(data.current.weather_code, data.current.is_day === 1, data.current.wind_speed_10m);
+        updateTopBarTime();
+      }
+    } catch (_) { /* leave placeholder */ }
+  }
+  fetchWeather();
+  setInterval(fetchWeather, 15 * 60 * 1000); // every 15 min (matches Open-Meteo update cadence)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') fetchWeather();
+  });
 
   function tick() {
     updateTopDate();
